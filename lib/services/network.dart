@@ -26,8 +26,8 @@ Stream<NetworkDevice> findDevicesInNetwork(
     final ping = Ping(address, count: 1, timeout: AppConstants.homePingTimeout);
 
     // Wait for the current ping to complete
-    await for (final response in ping.stream) {
-      if (response.response != null && response.error == null) {
+    await for (final event in ping.stream) {
+      if (event is PingResponse) {
         // try to get the hostname of the device
         String host = "";
         try {
@@ -161,8 +161,8 @@ Stream<Message> sendWolPackage(
     final ping = Ping(ip, count: 1, timeout: 5);
 
     // Wait for the current ping to complete
-    await for (final response in ping.stream) {
-      if (response.response != null && response.error == null) {
+    await for (final event in ping.stream) {
+      if (event is PingResponse) {
         online = true;
       }
     }
@@ -197,39 +197,10 @@ Future<bool> pingDevice({required String ipAddress}) async {
   final ping = Ping(ipAddress, count: 1, timeout: 3);
 
   // Wait for the current ping to complete
-  await for (final response in ping.stream) {
-    if (response.response != null && response.error == null) {
+  await for (final event in ping.stream) {
+    if (event is PingResponse) {
       return true;
     }
   }
   return false;
 }
-
-/// Playground: Test different Discover methods
-
-// void findDevicesMDNS() async {
-//   const String name = '_dartobservatory._tcp.local';
-//   final MDnsClient client = MDnsClient();
-//   // Start the client with default options.
-//   await client.start();
-//
-//   // Get the PTR record for the service.
-//   await for (final PtrResourceRecord ptr in client
-//       .lookup<PtrResourceRecord>(ResourceRecordQuery.serverPointer(name))) {
-//     // Use the domainName from the PTR record to get the SRV record,
-//     // which will have the port and local hostname.
-//     // Note that duplicate messages may come through, especially if any
-//     // other mDNS queries are running elsewhere on the machine.
-//     await for (final SrvResourceRecord srv in client.lookup<SrvResourceRecord>(
-//         ResourceRecordQuery.service(ptr.domainName))) {
-//       // Domain name will be something like "io.flutter.example@some-iphone.local._dartobservatory._tcp.local"
-//       final String bundleId =
-//           ptr.domainName; //.substring(0, ptr.domainName.indexOf('@'));
-//       // print('Dart observatory instance found at '
-//       //     '${srv.target}:${srv.port} for "$bundleId".');
-//     }
-//   }
-//   client.stop();
-//
-//   // print('Done.');
-// }

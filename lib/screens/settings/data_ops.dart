@@ -14,18 +14,16 @@ Future<void> shareJsonFile() async {
     await file.create();
   }
 
-  // Share the file using the Share plugin
-  await Share.shareXFiles([XFile(filePath)], subject: 'devices.json');
+  await SharePlus.instance.share(
+    ShareParams(files: [XFile(filePath)], subject: 'devices.json'),
+  );
 }
 
 Future<File?> getJsonFile() async {
-  FilePickerResult? result = await FilePicker.platform.pickFiles();
+  final picked = await FilePicker.pickFile();
+  final path = picked?.path;
 
-  if (result == null || result.files.single.path == null) return null;
+  if (path == null) return null;
 
-  File file = File(result.files.single.path!);
-
-  //if (file.path.split('.').last != 'json') return null;
-
-  return file;
+  return File(path);
 }
