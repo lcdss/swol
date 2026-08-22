@@ -6,6 +6,9 @@ import 'package:swol/l10n/app_localizations.dart';
 import 'package:swol/widgets/chip_cards.dart';
 
 class AppConstants {
+  /// Seed for the Material 3 tonal palettes, taken from the launcher icon.
+  static const seedColor = Color(0xFF287980);
+
   /// Navigation Bar Icons
   static const homeIcon = Icons.home;
   static const settingsIcon = Icons.settings;
@@ -26,7 +29,6 @@ class AppConstants {
   // Wake Up Dialog Elements
   static const errorMessageColor = Colors.red;
   static const successMessageColor = Colors.green;
-  static const infoMessageColor = Colors.black;
 
   // Discover Page Elements
   static const addCustomDeviceType = 'desktop';

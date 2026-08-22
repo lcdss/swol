@@ -34,8 +34,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AdaptiveTheme(
-      light: ThemeData(brightness: Brightness.light, useMaterial3: true),
-      dark: ThemeData(brightness: Brightness.dark, useMaterial3: true),
+      light: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.seedColor),
+      ),
+      dark: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppConstants.seedColor,
+          brightness: Brightness.dark,
+        ),
+      ),
       initial: savedThemeMode ?? AdaptiveThemeMode.system,
       builder: (ThemeData light, ThemeData dark) => MaterialApp(
         onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
@@ -98,15 +105,18 @@ class _MyHomePageState extends State<MyHomePage> {
         packageInfo: widget.packageInfo,
       ),
     ];
+    // Icons have to contrast with the surface behind them, so they invert
+    // relative to the theme's own brightness.
+    final overlayIconBrightness =
+        Theme.of(context).brightness == Brightness.light
+        ? Brightness.dark
+        : Brightness.light;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent, //top status bar
-        systemNavigationBarColor: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHighest, // navigation bar color, the one Im looking for
-        statusBarIconBrightness: Brightness.dark, // status bar icons' color
-        systemNavigationBarIconBrightness:
-            Brightness.dark, //navigation bar icons' color
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: overlayIconBrightness,
+        systemNavigationBarIconBrightness: overlayIconBrightness,
       ),
       child: Scaffold(
         body: screens[selectedNavigationIndex],
