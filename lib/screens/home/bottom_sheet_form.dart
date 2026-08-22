@@ -47,8 +47,8 @@ abstract class ModularBottomFormPage extends StatefulWidget {
 
 class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   // set label of chipsWolPorts to the translated string
-  late List<CustomChoiceChip<int>> chipsWolPorts = AppConstants()
-      .getChipsWolPorts(context: context);
+  late List<CustomChoiceChip<int>> chipsWolPorts =
+      AppConstants.getChipsWolPorts(context: context);
 
   final _controllerName = TextEditingController();
   final _controllerPort = TextEditingController();
@@ -105,7 +105,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
       onMatch: (List<String> match) {},
       targetMatches: [
         MatchTargetItem(
-          regex: AppConstants().ipPattern,
+          regex: AppConstants.ipPattern,
           style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
           allowInlineMatching: true,
         ),
@@ -116,7 +116,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
       onMatch: (List<String> match) {},
       targetMatches: [
         MatchTargetItem(
-          regex: AppConstants().macPattern,
+          regex: AppConstants.macPattern,
           style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
           allowInlineMatching: true,
         ),
@@ -129,7 +129,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
     _controllerMac.text = widget.device.macAddress;
 
     // Labels need a BuildContext to localize, so match on value only here.
-    final wolPorts = AppConstants().getChipsWolPorts();
+    final wolPorts = AppConstants.getChipsWolPorts();
     final wolElement = wolPorts.where(
       (element) => element.value == widget.device.wolPort,
     );
@@ -141,7 +141,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
     }
 
     // initialize the icon selector
-    final deviceTypes = AppConstants().getChipsDeviceTypes();
+    final deviceTypes = AppConstants.getChipsDeviceTypes();
     final deviceType = deviceTypes.where(
       (element) => element.value == widget.device.deviceType,
     );
@@ -180,7 +180,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
           20,
           15,
           20,
-          MediaQuery.of(context).viewInsets.bottom,
+          MediaQuery.viewInsetsOf(context).bottom,
         ),
         child: ListView(
           primary: true,
@@ -460,8 +460,8 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   /// returns a custom selector for the icon of the device
   /// * [textTheme] the text theme of the current context
   Column buildIconSelector(TextTheme textTheme) {
-    List<CustomChoiceChip<String>> chipsDeviceTypes = AppConstants()
-        .getChipsDeviceTypes(context: context);
+    List<CustomChoiceChip<String>> chipsDeviceTypes =
+        AppConstants.getChipsDeviceTypes(context: context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,

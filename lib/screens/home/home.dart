@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
@@ -20,7 +22,7 @@ import 'bottom_sheet_form.dart';
 enum SortingOrder { alphabetical, recently, type }
 
 class HomePage extends StatefulWidget {
-  HomePage({
+  const HomePage({
     super.key,
     required this.title,
     required this.onSelectedMenuChange,
@@ -37,8 +39,6 @@ class HomePage extends StatefulWidget {
   final ValueChanged<List<bool>> onSelectedDeviceTypesChange;
   final List<bool> deviceTypesValues;
 
-  final chipsDeviceTypes = AppConstants().getChipsDeviceTypes();
-
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -49,11 +49,19 @@ class _HomePageState extends State<HomePage> {
   List<StorageDevice> _devices = [];
   bool _isLoading = false;
 
-  late List<bool> deviceTypesValues = widget.deviceTypesValues;
-
-  late SortingOrder selectedMenu = widget.selectedMenu;
-
   Timer? _pingDevicesTimer;
+
+  @override
+  void didUpdateWidget(HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!listEquals(oldWidget.deviceTypesValues, widget.deviceTypesValues)) {
+      filterDevicesByType();
+    }
+    if (oldWidget.selectedMenu != widget.selectedMenu) {
+      sortDevices();
+    }
+  }
 
   @override
   void initState() {
@@ -96,9 +104,9 @@ class _HomePageState extends State<HomePage> {
       if (device.deviceType == null) {
         sortedDevices.add(device);
       } else {
-        for (int i = 0; i < widget.chipsDeviceTypes.length; i++) {
-          if (deviceTypesValues[i] &&
-              device.deviceType == widget.chipsDeviceTypes[i].value) {
+        final types = AppConstants.deviceTypeIcons.keys.toList();
+        for (int i = 0; i < types.length; i++) {
+          if (widget.deviceTypesValues[i] && device.deviceType == types[i]) {
             sortedDevices.add(device);
             break;
           }
@@ -112,7 +120,7 @@ class _HomePageState extends State<HomePage> {
 
   /// sort devices by selectedMenu value. [alphabetical], [recently] and [type] are possible.
   void sortDevices() {
-    final Comparator<StorageDevice> comparator = switch (selectedMenu) {
+    final Comparator<StorageDevice> comparator = switch (widget.selectedMenu) {
       SortingOrder.alphabetical => (a, b) => a.hostName.toLowerCase().compareTo(
         b.hostName.toLowerCase(),
       ),
@@ -168,19 +176,11 @@ class _HomePageState extends State<HomePage> {
           ),
           // The menu should appear below the button. The offset is dependent of the selected menu item so the offset is calculated dependent of
           // the current selected menu item.
-          offset: Offset(
-            0,
-            00 + 50.0 * (SortingOrder.values[selectedMenu.index].index + 1),
-          ),
-          initialValue: selectedMenu,
+          offset: Offset(0, 00 + 50.0 * (widget.selectedMenu.index + 1)),
+          initialValue: widget.selectedMenu,
           // Callback that sets the selected popup menu item.
-          onSelected: (SortingOrder item) {
-            setState(() {
-              selectedMenu = item;
-              widget.onSelectedMenuChange(item);
-            });
-            sortDevices();
-          },
+          // The parent owns the value, so the resulting didUpdateWidget sorts.
+          onSelected: widget.onSelectedMenuChange,
           itemBuilder: (BuildContext context) => <PopupMenuEntry<SortingOrder>>[
             PopupMenuItem<SortingOrder>(
               value: SortingOrder.alphabetical,
@@ -262,8 +262,8 @@ class _HomePageState extends State<HomePage> {
 
   /// returns a List of Chips for filtering devices
   ListView filterDevicesChipsV2() {
-    List<CustomChoiceChip<String>> chipsDeviceTypes = AppConstants()
-        .getChipsDeviceTypes(context: context);
+    List<CustomChoiceChip<String>> chipsDeviceTypes =
+        AppConstants.getChipsDeviceTypes(context: context);
     return ListView(
       primary: true,
       shrinkWrap: true,
@@ -277,21 +277,21 @@ class _HomePageState extends State<HomePage> {
             return ActionChip(
               avatar: Icon(icon),
               label: Row(children: [if (label != null) Text(label)]),
-              backgroundColor: deviceTypesValues[index]
+              backgroundColor: widget.deviceTypesValues[index]
                   ? Theme.of(context).colorScheme.secondaryContainer
                   : Theme.of(context).colorScheme.surface,
               side: BorderSide(
-                color: deviceTypesValues[index]
+                color: widget.deviceTypesValues[index]
                     ? Theme.of(context).colorScheme.secondaryContainer
                     : Theme.of(context).colorScheme.secondary,
                 width: 1.0,
               ),
-              // selected: mode == chipsTheme[index].value,
               onPressed: () {
-                setState(() {
-                  deviceTypesValues[index] = !deviceTypesValues[index];
-                  filterDevicesByType();
-                });
+                // Toggling in place would mutate the parent's own list behind
+                // its back, so hand it a new one and let it rebuild us.
+                final toggled = [...widget.deviceTypesValues];
+                toggled[index] = !toggled[index];
+                widget.onSelectedDeviceTypesChange(toggled);
               },
             );
           }),

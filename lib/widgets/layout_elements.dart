@@ -13,10 +13,6 @@ class TextTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // add a sized box between each button
-    for (int i = 1; i < children.length; i += 2) {
-      children.insert(i, const SizedBox(height: 5));
-    }
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 3),
       child: Column(
@@ -28,6 +24,7 @@ class TextTitle extends StatelessWidget {
             padding: const EdgeInsets.only(left: 5, top: 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 5,
               children: children,
             ),
           ),
@@ -120,12 +117,9 @@ class SpacedRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // add a sized box between each button
-    for (int i = 1; i < children.length; i += 2) {
-      children.insert(i, const SizedBox(width: 15));
-    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      spacing: 15,
       children: children,
     );
   }

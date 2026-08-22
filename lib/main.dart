@@ -75,10 +75,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // values from homePage which should be stored in memory while the app is running
   SortingOrder selectedMenu = SortingOrder.alphabetical;
-  late List<bool> deviceTypesValues = List<bool>.filled(
-    AppConstants().getChipsDeviceTypes().length,
+  List<bool> deviceTypesValues = List<bool>.filled(
+    AppConstants.deviceTypeIcons.length,
     true,
-    growable: false,
   );
 
   @override

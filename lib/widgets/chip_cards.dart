@@ -17,8 +17,8 @@ class ThemeSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<CustomChoiceChip<AdaptiveThemeMode>> chipsTheme = AppConstants()
-        .getChipsTheme(context: context);
+    List<CustomChoiceChip<AdaptiveThemeMode>> chipsTheme =
+        AppConstants.getChipsTheme(context: context);
     return ValueListenableBuilder(
       valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
       builder: (_, mode, child) {

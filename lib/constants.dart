@@ -51,11 +51,11 @@ class AppConstants {
   static const formInvalidArgument = Icons.cancel_outlined;
 
   // replacement patterns for the rich text controllers of mac and ip address
-  RegExp macPattern = RegExp(r"[:-]");
-  RegExp ipPattern = RegExp(r"\.");
+  static final macPattern = RegExp(r"[:-]");
+  static final ipPattern = RegExp(r"\.");
 
   // WOL Port Chips
-  List<CustomChoiceChip<int>> getChipsWolPorts({BuildContext? context}) {
+  static List<CustomChoiceChip<int>> getChipsWolPorts({BuildContext? context}) {
     final List<CustomChoiceChip<int>> chipsWolPorts = <CustomChoiceChip<int>>[
       const CustomChoiceChip(value: 7),
       const CustomChoiceChip(value: 9),
@@ -75,76 +75,51 @@ class AppConstants {
   }
 
   // Icon chips
-  List<CustomChoiceChip<String>> getChipsDeviceTypes({BuildContext? context}) {
-    return <CustomChoiceChip<String>>[
-      CustomChoiceChip(
-        label: context != null
-            ? AppLocalizations.of(context)!.deviceChoiceServer
-            : null,
-        icon: Icons.storage_rounded,
-        value: 'server',
-      ),
-      CustomChoiceChip(
-        label: context != null
-            ? AppLocalizations.of(context)!.deviceChoiceDesktop
-            : null,
-        icon: Icons.desktop_mac_rounded,
-        value: 'desktop',
-      ),
-      CustomChoiceChip(
-        label: context != null
-            ? AppLocalizations.of(context)!.deviceChoiceLaptop
-            : null,
-        icon: Icons.laptop_mac,
-        value: 'laptop',
-      ),
-      CustomChoiceChip(
-        label: context != null
-            ? AppLocalizations.of(context)!.deviceChoicePrinter
-            : null,
-        icon: Icons.print_rounded,
-        value: 'printer',
-      ),
-      CustomChoiceChip(
-        label: context != null
-            ? AppLocalizations.of(context)!.deviceChoiceNetwork
-            : null,
-        icon: Icons.lan_rounded,
-        value: 'network',
-      ),
-      CustomChoiceChip(
-        label: context != null
-            ? AppLocalizations.of(context)!.deviceChoiceIOT
-            : null,
-        icon: Icons.smart_toy,
-        value: 'iot',
-      ),
-      CustomChoiceChip(
-        label: context != null
-            ? AppLocalizations.of(context)!.deviceChoiceTv
-            : null,
-        icon: Icons.tv_rounded,
-        value: 'tv',
-      ),
-      CustomChoiceChip(
-        label: context != null
-            ? AppLocalizations.of(context)!.deviceChoiceMobile
-            : null,
-        icon: Icons.phone_iphone,
-        value: 'mobile',
-      ),
-      CustomChoiceChip(
-        label: context != null
-            ? AppLocalizations.of(context)!.deviceChoiceOther
-            : null,
-        icon: Icons.tune_rounded,
-        value: 'other',
-      ),
-    ];
+  /// Device type value to icon. Insertion order is the chip order.
+  static const deviceTypeIcons = <String, IconData>{
+    'server': Icons.storage_rounded,
+    'desktop': Icons.desktop_mac_rounded,
+    'laptop': Icons.laptop_mac,
+    'printer': Icons.print_rounded,
+    'network': Icons.lan_rounded,
+    'iot': Icons.smart_toy,
+    'tv': Icons.tv_rounded,
+    'mobile': Icons.phone_iphone,
+    'other': Icons.tune_rounded,
+  };
+
+  static String deviceTypeLabel(BuildContext context, String value) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return switch (value) {
+      'server' => l10n.deviceChoiceServer,
+      'desktop' => l10n.deviceChoiceDesktop,
+      'laptop' => l10n.deviceChoiceLaptop,
+      'printer' => l10n.deviceChoicePrinter,
+      'network' => l10n.deviceChoiceNetwork,
+      'iot' => l10n.deviceChoiceIOT,
+      'tv' => l10n.deviceChoiceTv,
+      'mobile' => l10n.deviceChoiceMobile,
+      _ => l10n.deviceChoiceOther,
+    };
+  }
+
+  static List<CustomChoiceChip<String>> getChipsDeviceTypes({
+    BuildContext? context,
+  }) {
+    return deviceTypeIcons.entries
+        .map(
+          (entry) => CustomChoiceChip(
+            label: context == null ? null : deviceTypeLabel(context, entry.key),
+            icon: entry.value,
+            value: entry.key,
+          ),
+        )
+        .toList();
   }
 
   // Theme Chips
-  List<CustomChoiceChip<AdaptiveThemeMode>> getChipsTheme({
+  static List<CustomChoiceChip<AdaptiveThemeMode>> getChipsTheme({
     required BuildContext context,
   }) {
     return <CustomChoiceChip<AdaptiveThemeMode>>[
@@ -190,5 +165,5 @@ class AppConstants {
     top: 0,
     bottom: 80,
   );
-  static BorderRadius borderRadius = BorderRadius.circular(10);
+  static final borderRadius = BorderRadius.circular(10);
 }

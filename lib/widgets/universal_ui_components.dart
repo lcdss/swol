@@ -2,7 +2,6 @@ import 'package:material_ui/material_ui.dart';
 
 import '../constants.dart';
 import '../screens/home/bottom_sheet_form.dart';
-import 'chip_cards.dart';
 
 void showCustomBottomSheet({
   required BuildContext context,
@@ -12,7 +11,7 @@ void showCustomBottomSheet({
     isScrollControlled: true,
     // only expand the bottom sheet to 85% of the screen height
     constraints: BoxConstraints(
-      maxHeight: MediaQuery.of(context).size.height * 0.85,
+      maxHeight: MediaQuery.sizeOf(context).height * 0.85,
     ),
     context: context,
     backgroundColor: Theme.of(context).colorScheme.surface,
@@ -90,14 +89,7 @@ Widget customAlertDialog({
 }
 
 /// get the icon for a specific [deviceType]. If the device type is not found, return null
-/// uses the AppConstants().getChipsDeviceTypes() list and searches for the device type matching the given deviceType
+/// uses the AppConstants.getChipsDeviceTypes() list and searches for the device type matching the given deviceType
 /// orElse in the firstWhere function is needed if the deviceType is not found in the list so no state error is thrown
-IconData? getIcon(String? deviceType) {
-  return AppConstants()
-      .getChipsDeviceTypes()
-      .firstWhere(
-        (element) => element.value == deviceType,
-        orElse: () => const CustomChoiceChip(value: ''),
-      )
-      .icon;
-}
+IconData? getIcon(String? deviceType) =>
+    AppConstants.deviceTypeIcons[deviceType];
