@@ -1,0 +1,37 @@
+android/settings.gradle.kts
+  s_7efe093dbda125::t_96d45bec7799af 1-26
+android/app/src/main/kotlin/dev/lcss/swol/MainActivity.kt
+  s_7efe093dbda125::t_96d45bec7799af 5
+android/app/build.gradle.kts
+  s_7efe093dbda125::t_96d45bec7799af 3-6,15,17-29,33-39,51-54,61-73
+  s_7efe093dbda125::t_16e9e06d1e528e 1-2,7-14,16,30-32,40-50,55-60
+.metadata
+  s_7efe093dbda125::t_96d45bec7799af 7,16-17,19-20
+android/.gitignore
+  s_7efe093dbda125::t_96d45bec7799af 8
+android/build.gradle.kts
+  s_7efe093dbda125::t_96d45bec7799af 1-24
+android/gradle.properties
+  s_7efe093dbda125::t_8d490eae6d366e 1
+  s_7efe093dbda125::t_96d45bec7799af 3-6
+android/app/src/main/AndroidManifest.xml
+  s_7efe093dbda125::t_974d14928a5faf 2-6,10
+android/gradle/wrapper/gradle-wrapper.properties
+  s_7efe093dbda125::t_96d45bec7799af 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "e15c617e89f2cb07a491689a1b4e6d3d347ce5da",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
