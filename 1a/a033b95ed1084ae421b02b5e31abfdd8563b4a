@@ -1,0 +1,19 @@
+lib/screens/settings/settings.dart
+  s_7efe093dbda125::t_cdff64a67782e4 50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "1aa033b95ed1084ae421b02b5e31abfdd8563b4a",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
