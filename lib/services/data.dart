@@ -153,16 +153,6 @@ class NetworkDevice extends Device {
     };
   }
 
-  static NetworkDevice fromJson(Map<String, dynamic> json) {
-    return NetworkDevice(
-      ipAddress: json['hostName'],
-      macAddress: json['macAddress'],
-      hostName: json['name'],
-      wolPort: json['wolPort'],
-      deviceType: json['deviceType'],
-    );
-  }
-
   StorageDevice toStorageDevice({
     required String id,
     String? name,

@@ -112,30 +112,17 @@ class _HomePageState extends State<HomePage> {
 
   /// sort devices by selectedMenu value. [alphabetical], [recently] and [type] are possible.
   void sortDevices() {
-    switch (selectedMenu) {
-      case SortingOrder.alphabetical:
-        setState(() {
-          _devices.sort(
-            (a, b) =>
-                a.hostName.toLowerCase().compareTo(b.hostName.toLowerCase()),
-          );
-        });
-        break;
-      case SortingOrder.recently:
-        setState(() {
-          _devices.sort((a, b) => b.modified.compareTo(a.modified));
-        });
-        break;
-      case SortingOrder.type:
-        setState(() {
-          _devices.sort(
-            (a, b) => a.deviceType == null
-                ? -1
-                : a.deviceType!.compareTo(b.deviceType ?? ''),
-          );
-        });
-        break;
-    }
+    final Comparator<StorageDevice> comparator = switch (selectedMenu) {
+      SortingOrder.alphabetical => (a, b) => a.hostName.toLowerCase().compareTo(
+        b.hostName.toLowerCase(),
+      ),
+      SortingOrder.recently => (a, b) => b.modified.compareTo(a.modified),
+      SortingOrder.type => (a, b) => (a.deviceType ?? '').compareTo(
+        b.deviceType ?? '',
+      ),
+    };
+
+    setState(() => _devices.sort(comparator));
   }
 
   /// ping devices periodically in the background to get the current status
@@ -211,22 +198,15 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: ActionButton(
-        onPressed: () async {
-          final newDevice = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DiscoverPage(
-                updateDevicesList: updateDevicesList,
-                devices: _devices,
-              ),
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DiscoverPage(
+              updateDevicesList: updateDevicesList,
+              devices: _devices,
             ),
-          );
-          if (newDevice != null) {
-            setState(() {
-              _devicesRaw.add(newDevice);
-            });
-          }
-        },
+          ),
+        ),
         text: AppLocalizations.of(context)!.homeAddDeviceButton,
         icon: AppConstants.add,
       ),

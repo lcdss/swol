@@ -6,6 +6,29 @@ import 'package:uuid/uuid.dart';
 
 import 'data.dart';
 
+/// Decodes the persisted device list.
+///
+/// Throws [FormatException] for anything that is not a JSON list of device
+/// objects, so a corrupt or hand-edited file cannot surface as a raw
+/// [TypeError] from deep inside [StorageDevice.fromJson].
+List<StorageDevice> parseStorageDevices(String contents) {
+  final decoded = json.decode(contents);
+
+  if (decoded is! List) {
+    throw FormatException(
+      'Expected a JSON list of devices, got ${decoded.runtimeType}',
+    );
+  }
+
+  try {
+    return decoded
+        .map((item) => StorageDevice.fromJson(item as Map<String, dynamic>))
+        .toList();
+  } on TypeError catch (error) {
+    throw FormatException('Malformed device entry: $error');
+  }
+}
+
 class DeviceStorage {
   const DeviceStorage();
 
@@ -20,9 +43,7 @@ class DeviceStorage {
     try {
       final filePath = await getFilePath();
       final file = File(filePath);
-      final fileContents = await file.readAsString();
-      final jsonData = json.decode(fileContents) as List<dynamic>;
-      return jsonData.map((item) => StorageDevice.fromJson(item)).toList();
+      return parseStorageDevices(await file.readAsString());
     } on FileSystemException {
       return [];
     } on FormatException {

@@ -31,22 +31,22 @@ class _DiscoverPageState extends State<DiscoverPage> {
   @override
   void initState() {
     super.initState();
-    initSubnet();
     _deviceDiscovery();
   }
 
   String? _subnet;
 
-  Future<void> initSubnet() async {
-    String? subnet = await NetworkInfo().getWifiIP().then(
-      (value) => value?.substring(0, value.lastIndexOf('.')),
-    );
+  /// The /24 the device is on, or null when there is no usable Wi-Fi address.
+  ///
+  /// `getWifiIP` returns null when Wi-Fi is off or the platform withholds the
+  /// address, so this has to be allowed to fail rather than be waited on.
+  Future<String?> _resolveSubnet() async {
+    final ip = await NetworkInfo().getWifiIP();
+    final lastDot = ip?.lastIndexOf('.') ?? -1;
 
-    if (!mounted) return;
+    if (ip == null || lastDot < 0) return null;
 
-    setState(() {
-      _subnet = subnet;
-    });
+    return ip.substring(0, lastDot);
   }
 
   // variables for discovering network devices and showing the progress in the ui
@@ -61,12 +61,19 @@ class _DiscoverPageState extends State<DiscoverPage> {
       _progress = 0.0;
     });
 
-    // wait until _subnet is initialized
-    while (_subnet == null) {
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
+    final subnet = await _resolveSubnet();
 
-    final stream = findDevicesInNetwork(_subnet!, (progress) {
+    if (!mounted) return;
+
+    setState(() {
+      _subnet = subnet;
+    });
+
+    // No subnet means nothing to scan; the card falls back to
+    // discoverCardSubnetNoNetwork and a pull-to-refresh can retry.
+    if (subnet == null) return;
+
+    final stream = findDevicesInNetwork(subnet, (progress) {
       if (!mounted) {
         // Exit the loop if the widget is no longer mounted.
         return;
@@ -90,6 +97,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
         });
       },
       onDone: () {
+        if (!mounted) return;
+
         setState(() {
           _subscription = null;
         });
@@ -131,8 +140,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
       onRefresh: () async {
         // on refresh should just be called when a scan of the network is done
         if (_subscription == null) {
-          initSubnet();
-          _deviceDiscovery();
+          await _deviceDiscovery();
         }
       },
       child: Column(

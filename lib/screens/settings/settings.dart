@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:material_ui/material_ui.dart';
@@ -111,12 +110,35 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  void showInvalidJsonDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return customDualChoiceAlertdialog(
+          title: AppLocalizations.of(context)!
+              .settingsResetDialogWrongJsonFormatTitle,
+          iconColor: Theme.of(context).colorScheme.error,
+          child: Text(
+            AppLocalizations.of(context)!
+                .settingsResetDialogWrongJsonFormatText,
+          ),
+          icon: AppConstants.warningIcon,
+          rightText: AppLocalizations.of(context)!.ok,
+          rightOnPressed: () => Navigator.pop(context),
+        );
+      },
+    );
+  }
+
   // get the file form the user and show an alert dialog
   Future<void> importJsonFile() async {
     File? file = await getJsonFile();
     List<StorageDevice> importedDevices = [];
 
-    if (file == null || !mounted) {
+    if (file == null) {
+      return;
+    }
+    if (!mounted) {
       return;
     }
 
@@ -144,31 +166,15 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     try {
-      final fileContents = await file.readAsString();
-      final jsonData = json.decode(fileContents) as List<dynamic>;
-      importedDevices = jsonData
-          .map((item) => StorageDevice.fromJson(item))
-          .toList();
+      importedDevices = parseStorageDevices(await file.readAsString());
     } on FileSystemException {
       if (!mounted) return;
+      showInvalidJsonDialog();
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return customDualChoiceAlertdialog(
-            title: AppLocalizations.of(context)!
-                .settingsResetDialogWrongJsonFormatTitle,
-            iconColor: Theme.of(context).colorScheme.error,
-            child: Text(
-              AppLocalizations.of(context)!
-                  .settingsResetDialogWrongJsonFormatText,
-            ),
-            icon: AppConstants.warningIcon,
-            rightText: AppLocalizations.of(context)!.ok,
-            rightOnPressed: () => Navigator.pop(context),
-          );
-        },
-      );
+      return;
+    } on FormatException {
+      if (!mounted) return;
+      showInvalidJsonDialog();
 
       return;
     }
