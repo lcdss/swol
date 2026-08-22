@@ -1,0 +1,5 @@
+# Pinned deliberately: this project sat unbuildable partly because nothing in
+# the repo said which Flutter it wanted, and CI floated on `channel: stable`.
+# Keep this in step with flutter-version in .github/workflows/.
+[tools]
+flutter = "3.47.0-stable"
