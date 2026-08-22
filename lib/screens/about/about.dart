@@ -204,7 +204,6 @@ class _AboutPageState extends State<AboutPage> {
             style: Theme.of(context).textTheme.bodySmall,
           ),
           minLeadingWidth: 0,
-          // ignore: sized_box_for_whitespace
           leading: const SizedBox(
             height: double.infinity,
             child: Icon(Icons.phone_iphone),

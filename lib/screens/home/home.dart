@@ -426,10 +426,7 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return StreamBuilder<List<Message>>(
-          stream: sendWolAndGetMessages(
-            context: context,
-            device: device.toNetworkDevice(),
-          ),
+          stream: sendWolAndGetMessages(device: device.toNetworkDevice()),
           builder:
               (BuildContext context, AsyncSnapshot<List<Message>> snapshot) {
                 // set color, text and icon of dialog box according to the arrived messages
@@ -463,7 +460,10 @@ class _HomePageState extends State<HomePage> {
                             itemBuilder: (context, index) {
                               final Message message = snapshot.data![index];
                               return Text(
-                                message.text,
+                                messageText(
+                                  AppLocalizations.of(context)!,
+                                  message,
+                                ),
                                 style: TextStyle(
                                   color: (message.type == MsgType.error)
                                       ? Theme.of(context).colorScheme.error
@@ -489,3 +489,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+/// Renders a wake-sequence [Message] for display.
+String messageText(AppLocalizations l10n, Message message) => switch (message) {
+  WolHostUnresolved(:final host) => l10n.homeWolCardHost(host),
+  WolInvalidIp(:final ip) => l10n.homeWolCardIp(ip),
+  WolInvalidMac(:final mac) => l10n.homeWolCardMac(mac),
+  WolInvalidPort(:final port) => l10n.homeWolCardPort(port),
+  WolInvalid() => l10n.homeWolCardInvalid,
+  WolValid() => l10n.homeWolCardValid,
+  WolSending() => l10n.homeWolCardSendWol,
+  WolSent(:final ip) => l10n.homeWolCardSendWolSuccess(ip),
+  WolSendFailed(:final ip) => l10n.homeWolCardSendWolFail(ip),
+  PingStarted() => l10n.homeWolCardPingInfo,
+  PingAttempt(:final attempt) => l10n.homeWolCardPing(attempt),
+  PingSucceeded() => l10n.homeWolCardPingSuccess,
+  PingFailed() => l10n.homeWolCardPingFail,
+};

@@ -114,7 +114,7 @@ class DeviceStorage {
       final file = File(filePath);
       await file.delete();
     } on FileSystemException {
-      // ignore
+      // Already gone, which is the desired end state.
     }
   }
 }

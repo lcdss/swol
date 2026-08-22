@@ -155,7 +155,6 @@ class DeviceCard extends StatelessWidget {
           title: title != null ? Text(title!) : null,
           subtitle: subtitle != null ? Text(subtitle!) : null,
           minLeadingWidth: 0,
-          // ignore: sized_box_for_whitespace
           leading: deviceType != null && getIcon(deviceType!) != null
               ? SizedBox(
                   height: double.infinity,

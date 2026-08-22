@@ -176,9 +176,113 @@ class NetworkDevice extends Device {
 
 enum MsgType { error, check, ping, online, other }
 
-class Message {
-  String text;
-  MsgType type;
+/// A step in the wake sequence.
+///
+/// Variants carry the data the step is about rather than a rendered string, so
+/// the service producing them never needs a [BuildContext] to describe its own
+/// progress -- localization happens where the message is displayed.
+sealed class Message {
+  const Message();
 
-  Message({required this.text, this.type = MsgType.other});
+  MsgType get type => MsgType.other;
+}
+
+/// A hostname was given but could not be resolved to an address.
+final class WolHostUnresolved extends Message {
+  const WolHostUnresolved(this.host);
+
+  final String host;
+
+  @override
+  MsgType get type => MsgType.error;
+}
+
+final class WolInvalidIp extends Message {
+  const WolInvalidIp(this.ip);
+
+  final String ip;
+
+  @override
+  MsgType get type => MsgType.error;
+}
+
+final class WolInvalidMac extends Message {
+  const WolInvalidMac(this.mac);
+
+  final String mac;
+
+  @override
+  MsgType get type => MsgType.error;
+}
+
+final class WolInvalidPort extends Message {
+  const WolInvalidPort(this.port);
+
+  /// Empty when no port was set at all.
+  final String port;
+
+  @override
+  MsgType get type => MsgType.error;
+}
+
+/// Summary emitted after any of the validation failures above.
+final class WolInvalid extends Message {
+  const WolInvalid();
+
+  @override
+  MsgType get type => MsgType.error;
+}
+
+final class WolValid extends Message {
+  const WolValid();
+}
+
+final class WolSending extends Message {
+  const WolSending();
+}
+
+final class WolSent extends Message {
+  const WolSent(this.ip);
+
+  final String ip;
+
+  @override
+  MsgType get type => MsgType.check;
+}
+
+final class WolSendFailed extends Message {
+  const WolSendFailed(this.ip);
+
+  final String ip;
+
+  @override
+  MsgType get type => MsgType.error;
+}
+
+final class PingStarted extends Message {
+  const PingStarted();
+}
+
+/// Emitted once per probe; [attempt] is 1-based.
+final class PingAttempt extends Message {
+  const PingAttempt(this.attempt);
+
+  final int attempt;
+
+  @override
+  MsgType get type => MsgType.ping;
+}
+
+final class PingSucceeded extends Message {
+  const PingSucceeded();
+
+  @override
+  MsgType get type => MsgType.online;
+}
+
+final class PingFailed extends Message {
+  const PingFailed();
+
+  @override
+  MsgType get type => MsgType.error;
 }
