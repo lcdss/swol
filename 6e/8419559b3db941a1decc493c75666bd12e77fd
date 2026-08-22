@@ -1,0 +1,45 @@
+lib/screens/about/about.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 62,67-69,76,81,86,91,98,120,124,130,142,150-151,164,173-177,179,189-214,226
+lib/screens/home/home.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 10,23-30,61-63,118-121,131-135,146-150,180,184-187,214-232,247-249,272,285-286,293-304,306-318,326,328-340,376-385,389-394,396-418,421-439,446-454,491-493,499,506-509
+lib/screens/settings/settings.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 9,37,47-51,57-85,94-111,127-142,149-151,156-171,179-199
+lib/main.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 28-32,37-38,51,72-75,81-94,97-99,123-125,127-129,131-133
+lib/services/data.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 10-16,36-45,112-118
+lib/services/form_input_formatters.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 14-20,24-26,53-56,59,79-81,101,113-117,122-125
+lib/services/network.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 12,70-73,86-88,102-104,112-114,137-139,153-155,170-172,192-195,197-200
+lib/services/database.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 45-51,61-63,77-82
+lib/constants.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 63-64,66-68,79-84,86-91,93-98,100-105,107-112,114-119,121-126,128-133,135-140,145-147,150-153,155-158,160-163,179-190
+lib/widgets/universal_ui_components.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 7-10,23-36,42-43,68,77-83,86-87,98-101
+lib/widgets/layout_elements.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 4,22-27,30-35,49-57,67-72,83,96-101,140-148,153-184,186-194
+lib/widgets/chip_cards.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 20-21,27-38,40-49
+lib/screens/home/bottom_sheet_form.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 12,25-32,53-55,60-68,90-93,105-106,116-136,144-146,155-157,180-184,204-207,210-218,220-227,229,246-262,300-302,309-312,334-340,349-356,373-374,391-394,398-409,411-428,438-441,464-465,470-473,483-497,499-518,529-531,534,547-549,554-557,570-572,574-577,579-584,605-611,615-616,623-629,633-634
+lib/screens/home/discover.dart
+  s_7efe093dbda125::t_4a0c8c8cb4eaa1 9,20-24,41-43,79-97,109,111-122,141-143,148,150-151,173-184,205-223
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "6e8419559b3db941a1decc493c75666bd12e77fd",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
