@@ -7,6 +7,8 @@ import 'package:uuid/uuid.dart';
 import 'data.dart';
 
 class DeviceStorage {
+  const DeviceStorage();
+
   static const _fileName = 'devices.json';
 
   Future<String> getFilePath() async {

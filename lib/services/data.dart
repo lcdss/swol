@@ -1,6 +1,6 @@
 import 'package:swol/services/utilities.dart';
 
-abstract class Device implements Comparable<NetworkDevice> {
+sealed class Device implements Comparable<Device> {
   final String hostName;
   final String ipAddress;
   final String macAddress;
@@ -45,7 +45,7 @@ class StorageDevice extends Device {
   });
 
   @override
-  int compareTo(NetworkDevice other) {
+  int compareTo(Device other) {
     return ipToNumeric(ipAddress).compareTo(ipToNumeric(other.ipAddress));
   }
 
@@ -118,7 +118,7 @@ class NetworkDevice extends Device {
   });
 
   @override
-  int compareTo(NetworkDevice other) {
+  int compareTo(Device other) {
     return ipToNumeric(ipAddress).compareTo(ipToNumeric(other.ipAddress));
   }
 

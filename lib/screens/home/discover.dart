@@ -99,8 +99,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
 
   @override
   void dispose() {
-    super.dispose();
     _subscription?.cancel();
+    super.dispose();
   }
 
   @override

@@ -22,7 +22,7 @@ abstract class ModularBottomFormPage extends StatefulWidget {
   final Function(List<StorageDevice>, String?) onSubmitDeviceCallback;
   final bool deleteButton;
 
-  ModularBottomFormPage({
+  const ModularBottomFormPage({
     super.key,
     required this.device,
     required this.devices,
@@ -31,70 +31,15 @@ abstract class ModularBottomFormPage extends StatefulWidget {
     this.deleteButton = false,
   });
 
-  // text controllers for the text input fields
-  final TextEditingController controllerName = TextEditingController();
-  final TextEditingController controllerPort = TextEditingController();
-  final TextEditingController controllerIcon = TextEditingController();
+  /// Persists [edited] -- the device as the form currently describes it -- and
+  /// returns the new device list along with the saved device.
+  Future<(List<StorageDevice>, StorageDevice)> dataOperationOnSave(
+    Device edited,
+  );
 
-  // Rich Text Controllers needed, so delimiter symbols are colored differently
-  late final RichTextController controllerIp; //= TextEditingController();
-  late final RichTextController controllerMac; //= TextEditingController();
-
-  final formKeyIp = GlobalKey<FormState>();
-  final formKeyMac = GlobalKey<FormState>();
-  final formKeyName = GlobalKey<FormState>();
-  final formKeyPort = GlobalKey<FormState>();
-
-  final chipDeviceTypes = AppConstants().getChipsDeviceTypes();
-  final chipWolPorts = AppConstants().getChipsWolPorts();
-
-  /// creates a [NetworkDevice] or [StorageDevice] class out of the currently stored inputs in the TextEditingControllers
-  Device get getDevice {
-    final wolPort = controllerPort.text.isEmpty
-        ? null
-        : int.parse(controllerPort.text);
-    final deviceType = controllerIcon.text.isEmpty ? null : controllerIcon.text;
-    if (device is StorageDevice) {
-      final storageDevice = device as StorageDevice;
-      return StorageDevice(
-        id: storageDevice.id,
-        hostName: controllerName.text,
-        ipAddress: controllerIp.text,
-        macAddress: controllerMac.text,
-        modified: DateTime.now(),
-        wolPort: wolPort,
-        isOnline: storageDevice.isOnline,
-        deviceType: deviceType,
-      );
-    } else {
-      return NetworkDevice(
-        hostName: controllerName.text,
-        ipAddress: controllerIp.text,
-        macAddress: controllerMac.text,
-        wolPort: wolPort,
-        deviceType: deviceType,
-      );
-    }
-  }
-
-  // DeviceStorage object to save the device to the json file
-  final deviceStorage = DeviceStorage();
-
-  /// dataOperationOnSave() is an abstract method that is implemented in the child classes and is called when the submitButton is pressed
-  /// it saves the device to the json file and returns the updated [StorageDevice] list
-  Future<(List<StorageDevice>, StorageDevice)> dataOperationOnSave();
-
-  /// dataOperationOnDelete() is triggered when the delete button is pressed and delete a device from the json file and returns the updated [StorageDevice] list
-  Future<List<StorageDevice>> dataOperationOnDelete() async {
-    StorageDevice device = getDevice as StorageDevice;
-    List<StorageDevice> devices = await deviceStorage.deleteDevice(
-      device.id,
-      this.devices,
-    );
-    return devices;
-  }
-
-  // Future<List<StorageDevice>> dataOperationOnDelete();
+  /// Removes [edited] from storage and returns the new device list.
+  Future<List<StorageDevice>> dataOperationOnDelete(Device edited) =>
+      const DeviceStorage().deleteDevice((edited as StorageDevice).id, devices);
 
   @override
   State<ModularBottomFormPage> createState() => _ModularBottomFormPageState();
@@ -105,15 +50,58 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   late List<CustomChoiceChip<int>> chipsWolPorts = AppConstants()
       .getChipsWolPorts(context: context);
 
+  final _controllerName = TextEditingController();
+  final _controllerPort = TextEditingController();
+  final _controllerIcon = TextEditingController();
+
+  // Rich Text Controllers needed, so delimiter symbols are colored differently
+  late final RichTextController _controllerIp;
+  late final RichTextController _controllerMac;
+
+  final _formKeyIp = GlobalKey<FormState>();
+  final _formKeyMac = GlobalKey<FormState>();
+  final _formKeyName = GlobalKey<FormState>();
+  final _formKeyPort = GlobalKey<FormState>();
+
   // variables for the chip selectors and initial port value
   int? indexWolSelector;
   int? indexIconSelector;
+
+  /// The device as the form currently describes it.
+  Device get _editedDevice {
+    final wolPort = _controllerPort.text.isEmpty
+        ? null
+        : int.parse(_controllerPort.text);
+    final deviceType = _controllerIcon.text.isEmpty
+        ? null
+        : _controllerIcon.text;
+
+    return switch (widget.device) {
+      StorageDevice(:final id, :final isOnline) => StorageDevice(
+        id: id,
+        hostName: _controllerName.text,
+        ipAddress: _controllerIp.text,
+        macAddress: _controllerMac.text,
+        modified: DateTime.now(),
+        wolPort: wolPort,
+        isOnline: isOnline,
+        deviceType: deviceType,
+      ),
+      NetworkDevice() => NetworkDevice(
+        hostName: _controllerName.text,
+        ipAddress: _controllerIp.text,
+        macAddress: _controllerMac.text,
+        wolPort: wolPort,
+        deviceType: deviceType,
+      ),
+    };
+  }
 
   @override
   void initState() {
     super.initState();
 
-    widget.controllerIp = RichTextController(
+    _controllerIp = RichTextController(
       onMatch: (List<String> match) {},
       targetMatches: [
         MatchTargetItem(
@@ -124,7 +112,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
       ],
     );
 
-    widget.controllerMac = RichTextController(
+    _controllerMac = RichTextController(
       onMatch: (List<String> match) {},
       targetMatches: [
         MatchTargetItem(
@@ -136,31 +124,43 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
     );
 
     // initialize the text controllers
-    widget.controllerName.text = widget.device.hostName;
-    widget.controllerIp.text = widget.device.ipAddress;
-    widget.controllerMac.text = widget.device.macAddress;
+    _controllerName.text = widget.device.hostName;
+    _controllerIp.text = widget.device.ipAddress;
+    _controllerMac.text = widget.device.macAddress;
 
-    // initialize the port text controller and the chip selector. AppConstants().chipsWolPorts
-    final wolElement = widget.chipWolPorts.where(
+    // Labels need a BuildContext to localize, so match on value only here.
+    final wolPorts = AppConstants().getChipsWolPorts();
+    final wolElement = wolPorts.where(
       (element) => element.value == widget.device.wolPort,
     );
     if (wolElement.isNotEmpty) {
-      indexWolSelector = widget.chipWolPorts.indexOf(wolElement.first);
+      indexWolSelector = wolPorts.indexOf(wolElement.first);
     }
     if (widget.device.wolPort != null) {
-      widget.controllerPort.text = widget.device.wolPort.toString();
+      _controllerPort.text = widget.device.wolPort.toString();
     }
 
     // initialize the icon selector
-    final deviceType = widget.chipDeviceTypes.where(
+    final deviceTypes = AppConstants().getChipsDeviceTypes();
+    final deviceType = deviceTypes.where(
       (element) => element.value == widget.device.deviceType,
     );
     if (deviceType.isNotEmpty) {
-      indexIconSelector = widget.chipDeviceTypes.indexOf(deviceType.first);
+      indexIconSelector = deviceTypes.indexOf(deviceType.first);
     }
     if (widget.device.deviceType != null) {
-      widget.controllerIcon.text = widget.device.deviceType.toString();
+      _controllerIcon.text = widget.device.deviceType.toString();
     }
+  }
+
+  @override
+  void dispose() {
+    _controllerName.dispose();
+    _controllerPort.dispose();
+    _controllerIcon.dispose();
+    _controllerIp.dispose();
+    _controllerMac.dispose();
+    super.dispose();
   }
 
   @override
@@ -199,8 +199,8 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
             ),
             getCustomTextFormField(
               label: AppLocalizations.of(context)!.formNameHint,
-              formKey: widget.formKeyName,
-              controller: widget.controllerName,
+              formKey: _formKeyName,
+              controller: _controllerName,
               validator: createValidator(
                 AppConstants.nameValidationRegex,
                 AppLocalizations.of(context)!.formNameError,
@@ -208,8 +208,8 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
             ),
             getCustomTextFormField(
               label: AppLocalizations.of(context)!.formIpHint,
-              formKey: widget.formKeyIp,
-              controller: widget.controllerIp,
+              formKey: _formKeyIp,
+              controller: _controllerIp,
               validator: createValidator(
                 AppConstants.ipValidationRegex,
                 AppLocalizations.of(context)!.formIpError,
@@ -218,8 +218,8 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
             ),
             getCustomTextFormField(
               label: AppLocalizations.of(context)!.formMacHint,
-              formKey: widget.formKeyMac,
-              controller: widget.controllerMac,
+              formKey: _formKeyMac,
+              controller: _controllerMac,
               validator: createValidator(
                 AppConstants.macValidationRegex,
                 AppLocalizations.of(context)!.formMacError,
@@ -248,7 +248,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
               onSubmitDeviceCallback: () async {
                 Navigator.popUntil(context, (route) => route.isFirst);
                 (List<StorageDevice>, StorageDevice) updatedDevices =
-                    await widget.dataOperationOnSave();
+                    await widget.dataOperationOnSave(_editedDevice);
                 // sent device to callback function in order to update the UI
                 widget.onSubmitDeviceCallback(
                   updatedDevices.$1,
@@ -271,16 +271,16 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   void validateFormFields({Function()? onSubmitDeviceCallback}) {
     List<String> errorMessage = [];
 
-    if (!widget.formKeyName.currentState!.validate()) {
+    if (!_formKeyName.currentState!.validate()) {
       errorMessage.add(AppLocalizations.of(context)!.formErrorMessageName);
     }
-    if (!widget.formKeyIp.currentState!.validate()) {
+    if (!_formKeyIp.currentState!.validate()) {
       errorMessage.add(AppLocalizations.of(context)!.formErrorMessageIp);
     }
-    if (!widget.formKeyMac.currentState!.validate()) {
+    if (!_formKeyMac.currentState!.validate()) {
       errorMessage.add(AppLocalizations.of(context)!.formErrorMessageMac);
     }
-    if (!widget.formKeyPort.currentState!.validate()) {
+    if (!_formKeyPort.currentState!.validate()) {
       errorMessage.add(AppLocalizations.of(context)!.formErrorMessagePort);
     }
     if (indexIconSelector == null) {
@@ -409,7 +409,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
                         ],
                       ),
                     ),
-                    side: widget.formKeyPort.currentState?.validate() == false
+                    side: _formKeyPort.currentState?.validate() == false
                         ? BorderSide(color: Theme.of(context).colorScheme.error)
                         : null,
                     selected: indexWolSelector == index,
@@ -417,10 +417,9 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
                       setState(() {
                         indexWolSelector = selected ? index : null;
                         (selected)
-                            ? widget.controllerPort.text = chipsWolPorts[index]
-                                  .value
+                            ? _controllerPort.text = chipsWolPorts[index].value
                                   .toString()
-                            : widget.controllerPort.text = '';
+                            : _controllerPort.text = '';
                       });
                     },
                   );
@@ -433,8 +432,8 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
           width: 90,
           child: getCustomTextFormField(
             label: AppLocalizations.of(context)!.formPortHint,
-            formKey: widget.formKeyPort,
-            controller: widget.controllerPort,
+            formKey: _formKeyPort,
+            controller: _controllerPort,
             validator: createValidator(
               AppConstants.portValidationRegex,
               AppLocalizations.of(context)!.formPortError,
@@ -505,11 +504,10 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
                       setState(() {
                         indexIconSelector = selected ? index : null;
                         if (selected) {
-                          widget.controllerIcon.text = chipsDeviceTypes[index]
-                              .value
+                          _controllerIcon.text = chipsDeviceTypes[index].value
                               .toString();
                         } else {
-                          widget.controllerIcon.text = '';
+                          _controllerIcon.text = '';
                         }
                       });
                     },
@@ -573,9 +571,9 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
                 TextSpan(
                   text: AppLocalizations.of(context)!.formDeleteAlertText,
                 ),
-                if (widget.controllerName.text.isNotEmpty)
+                if (_controllerName.text.isNotEmpty)
                   TextSpan(
-                    text: widget.controllerName.text,
+                    text: _controllerName.text,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 const TextSpan(text: '?'),
@@ -590,7 +588,9 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
           rightColor: Theme.of(context).colorScheme.error,
           rightOnPressed: () async {
             Navigator.popUntil(context, (route) => route.isFirst);
-            List<StorageDevice> devices = await widget.dataOperationOnDelete();
+            List<StorageDevice> devices = await widget.dataOperationOnDelete(
+              _editedDevice,
+            );
             // sent device to callback function in order to update the UI
             widget.onSubmitDeviceCallback(devices, null);
           },
@@ -602,7 +602,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
 
 /// An implementation of the [ModularBottomFormPage] for adding a new [NetworkDevice] from the [DiscoverPage]
 class NetworkDeviceFormPage extends ModularBottomFormPage {
-  NetworkDeviceFormPage({
+  const NetworkDeviceFormPage({
     super.key,
     required super.device,
     required super.devices,
@@ -611,16 +611,14 @@ class NetworkDeviceFormPage extends ModularBottomFormPage {
   });
 
   @override
-  Future<(List<StorageDevice>, StorageDevice)> dataOperationOnSave() async {
-    (List<StorageDevice>, StorageDevice) updatedDevices = await deviceStorage
-        .addDevice(getDevice as NetworkDevice, devices);
-    return updatedDevices;
-  }
+  Future<(List<StorageDevice>, StorageDevice)> dataOperationOnSave(
+    Device edited,
+  ) => const DeviceStorage().addDevice(edited as NetworkDevice, devices);
 }
 
 /// An implementation of the [ModularBottomFormPage] for editing an already existing [StorageDevice] from the [HomePage]
 class EditDeviceFormPage extends ModularBottomFormPage {
-  EditDeviceFormPage({
+  const EditDeviceFormPage({
     super.key,
     required super.device,
     required super.title,
@@ -629,14 +627,12 @@ class EditDeviceFormPage extends ModularBottomFormPage {
   }) : super(deleteButton: true);
 
   @override
-  Future<(List<StorageDevice>, StorageDevice)> dataOperationOnSave() async {
-    (List<StorageDevice>, StorageDevice) updatedDevices = await deviceStorage
-        .updateDevice(getDevice as StorageDevice, devices);
-    return updatedDevices;
-  }
+  Future<(List<StorageDevice>, StorageDevice)> dataOperationOnSave(
+    Device edited,
+  ) => const DeviceStorage().updateDevice(edited as StorageDevice, devices);
 }
 
 /// return a validator function which can be passed to a [TextFormField] in order to validate the Input.
 /// [regEx] is the RegEx to be evaluated, [msg] ist the error message being shown, if the input doesn't satisfy the RegEx
 String? Function(String?) createValidator(String regEx, String msg) =>
-    (String? value) => !RegExp(regEx).hasMatch(value!) ? msg : null;
+    (String? value) => !RegExp(regEx).hasMatch(value ?? '') ? msg : null;
