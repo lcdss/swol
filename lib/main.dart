@@ -25,20 +25,17 @@ void main() async {
 class MyApp extends StatelessWidget {
   final AdaptiveThemeMode? savedThemeMode;
   final PackageInfo packageInfo;
-  const MyApp(
-      {super.key, required this.savedThemeMode, required this.packageInfo});
+  const MyApp({
+    super.key,
+    required this.savedThemeMode,
+    required this.packageInfo,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AdaptiveTheme(
-      light: ThemeData(
-        brightness: Brightness.light,
-        useMaterial3: true,
-      ),
-      dark: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
+      light: ThemeData(brightness: Brightness.light, useMaterial3: true),
+      dark: ThemeData(brightness: Brightness.dark, useMaterial3: true),
       initial: savedThemeMode ?? AdaptiveThemeMode.system,
       builder: (ThemeData light, ThemeData dark) => MaterialApp(
         onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
@@ -51,9 +48,7 @@ class MyApp extends StatelessWidget {
         ],
         theme: light,
         darkTheme: dark,
-        home: MyHomePage(
-          packageInfo: packageInfo,
-        ),
+        home: MyHomePage(packageInfo: packageInfo),
       ),
     );
   }
@@ -74,30 +69,34 @@ class _MyHomePageState extends State<MyHomePage> {
   // values from homePage which should be stored in memory while the app is running
   SortingOrder selectedMenu = SortingOrder.alphabetical;
   late List<bool> deviceTypesValues = List<bool>.filled(
-      AppConstants().getChipsDeviceTypes().length, true,
-      growable: false);
+    AppConstants().getChipsDeviceTypes().length,
+    true,
+    growable: false,
+  );
 
   @override
   Widget build(BuildContext context) {
     final screens = [
       HomePage(
-          title: AppLocalizations.of(context)!.homePageTitle,
-          onSelectedMenuChange: (SortingOrder order) {
-            setState(() {
-              selectedMenu = order;
-            });
-          },
-          selectedMenu: selectedMenu,
-          onSelectedDeviceTypesChange: (List<bool> values) {
-            setState(() {
-              deviceTypesValues = values;
-            });
-          },
-          deviceTypesValues: deviceTypesValues),
+        title: AppLocalizations.of(context)!.homePageTitle,
+        onSelectedMenuChange: (SortingOrder order) {
+          setState(() {
+            selectedMenu = order;
+          });
+        },
+        selectedMenu: selectedMenu,
+        onSelectedDeviceTypesChange: (List<bool> values) {
+          setState(() {
+            deviceTypesValues = values;
+          });
+        },
+        deviceTypesValues: deviceTypesValues,
+      ),
       SettingsPage(title: AppLocalizations.of(context)!.settingsPageTitle),
       AboutPage(
-          title: AppLocalizations.of(context)!.aboutPageTitle,
-          packageInfo: widget.packageInfo),
+        title: AppLocalizations.of(context)!.aboutPageTitle,
+        packageInfo: widget.packageInfo,
+      ),
     ];
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -121,18 +120,17 @@ class _MyHomePageState extends State<MyHomePage> {
           labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           destinations: [
             NavigationDestination(
-                icon: const Icon(AppConstants.homeIcon),
-                label: AppLocalizations.of(context)!.homePageLabel),
+              icon: const Icon(AppConstants.homeIcon),
+              label: AppLocalizations.of(context)!.homePageLabel,
+            ),
             NavigationDestination(
-                icon: const Icon(
-                  AppConstants.settingsIcon,
-                ),
-                label: AppLocalizations.of(context)!.settingsPageTitle),
+              icon: const Icon(AppConstants.settingsIcon),
+              label: AppLocalizations.of(context)!.settingsPageTitle,
+            ),
             NavigationDestination(
-                icon: const Icon(
-                  AppConstants.aboutIcon,
-                ),
-                label: AppLocalizations.of(context)!.aboutPageTitle),
+              icon: const Icon(AppConstants.aboutIcon),
+              label: AppLocalizations.of(context)!.aboutPageTitle,
+            ),
           ],
         ),
       ),

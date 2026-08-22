@@ -4,8 +4,10 @@ import '../constants.dart';
 import '../screens/home/bottom_sheet_form.dart';
 import 'chip_cards.dart';
 
-void showCustomBottomSheet(
-    {required BuildContext context, required ModularBottomFormPage formPage}) {
+void showCustomBottomSheet({
+  required BuildContext context,
+  required ModularBottomFormPage formPage,
+}) {
   showModalBottomSheet<dynamic>(
     isScrollControlled: true,
     // only expand the bottom sheet to 85% of the screen height
@@ -18,25 +20,27 @@ void showCustomBottomSheet(
   );
 }
 
-Widget customDualChoiceAlertdialog(
-    {String? title,
-    Widget? child,
-    IconData? icon,
-    Color? iconColor,
-    String? leftText,
-    String? rightText,
-    Color? leftColor,
-    Color? rightColor,
-    IconData? leftIcon,
-    IconData? rightIcon,
-    Function()? leftOnPressed,
-    Function()? rightOnPressed}) {
+Widget customDualChoiceAlertdialog({
+  String? title,
+  Widget? child,
+  IconData? icon,
+  Color? iconColor,
+  String? leftText,
+  String? rightText,
+  Color? leftColor,
+  Color? rightColor,
+  IconData? leftIcon,
+  IconData? rightIcon,
+  Function()? leftOnPressed,
+  Function()? rightOnPressed,
+}) {
   return customAlertDialog(
     title: title,
     child: child,
     icon: icon,
     iconColor: iconColor,
-    actions: (leftIcon != null ||
+    actions:
+        (leftIcon != null ||
             rightIcon != null ||
             leftText != null ||
             rightText != null)
@@ -61,10 +65,7 @@ Widget customDualChoiceAlertdialog(
                   if (rightIcon != null) Icon(rightIcon),
                   const SizedBox(width: 5),
                   if (rightText != null)
-                    Text(
-                      rightText,
-                      style: TextStyle(color: rightColor),
-                    ),
+                    Text(rightText, style: TextStyle(color: rightColor)),
                 ],
               ),
             ),
@@ -73,24 +74,17 @@ Widget customDualChoiceAlertdialog(
   );
 }
 
-Widget customAlertDialog(
-    {String? title,
-    Widget? child,
-    IconData? icon,
-    Color? iconColor,
-    List<Widget>? actions}) {
+Widget customAlertDialog({
+  String? title,
+  Widget? child,
+  IconData? icon,
+  Color? iconColor,
+  List<Widget>? actions,
+}) {
   return AlertDialog(
     title: title != null ? Text(title) : null,
-    icon: icon != null
-        ? Icon(
-            icon,
-            size: 80,
-            color: iconColor,
-          )
-        : null,
-    content: SingleChildScrollView(
-      child: child,
-    ),
+    icon: icon != null ? Icon(icon, size: 80, color: iconColor) : null,
+    content: SingleChildScrollView(child: child),
     actions: actions,
   );
 }
@@ -101,7 +95,9 @@ Widget customAlertDialog(
 IconData? getIcon(String? deviceType) {
   return AppConstants()
       .getChipsDeviceTypes()
-      .firstWhere((element) => element.value == deviceType,
-          orElse: () => const CustomChoiceChip(value: ''))
+      .firstWhere(
+        (element) => element.value == deviceType,
+        orElse: () => const CustomChoiceChip(value: ''),
+      )
       .icon;
 }

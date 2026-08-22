@@ -7,6 +7,7 @@ import 'package:swol/l10n/app_localizations.dart';
 
 import 'package:swol/constants.dart';
 import 'package:swol/screens/home/discover.dart';
+
 import '../../services/data.dart';
 import '../../services/database.dart';
 import '../../services/network.dart';
@@ -19,13 +20,14 @@ import 'bottom_sheet_form.dart';
 enum SortingOrder { alphabetical, recently, type }
 
 class HomePage extends StatefulWidget {
-  HomePage(
-      {super.key,
-      required this.title,
-      required this.onSelectedMenuChange,
-      required this.selectedMenu,
-      required this.onSelectedDeviceTypesChange,
-      required this.deviceTypesValues});
+  HomePage({
+    super.key,
+    required this.title,
+    required this.onSelectedMenuChange,
+    required this.selectedMenu,
+    required this.onSelectedDeviceTypesChange,
+    required this.deviceTypesValues,
+  });
 
   final String title;
 
@@ -56,11 +58,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _loadDevices().then((value) => {
-          filterDevicesByType(),
-          sortDevices(),
-          _pingDevices(),
-        });
+    _loadDevices().then(
+      (value) => {filterDevicesByType(), sortDevices(), _pingDevices()},
+    );
   }
 
   @override
@@ -115,8 +115,10 @@ class _HomePageState extends State<HomePage> {
     switch (selectedMenu) {
       case SortingOrder.alphabetical:
         setState(() {
-          _devices.sort((a, b) =>
-              a.hostName.toLowerCase().compareTo(b.hostName.toLowerCase()));
+          _devices.sort(
+            (a, b) =>
+                a.hostName.toLowerCase().compareTo(b.hostName.toLowerCase()),
+          );
         });
         break;
       case SortingOrder.recently:
@@ -126,9 +128,11 @@ class _HomePageState extends State<HomePage> {
         break;
       case SortingOrder.type:
         setState(() {
-          _devices.sort((a, b) => a.deviceType == null
-              ? -1
-              : a.deviceType!.compareTo(b.deviceType ?? ''));
+          _devices.sort(
+            (a, b) => a.deviceType == null
+                ? -1
+                : a.deviceType!.compareTo(b.deviceType ?? ''),
+          );
         });
         break;
     }
@@ -139,9 +143,11 @@ class _HomePageState extends State<HomePage> {
   void _pingDevices() {
     checkAllDevicesStatus();
     _pingDevicesTimer = Timer.periodic(
-        const Duration(seconds: AppConstants.homePingInterval), (timer) {
-      checkAllDevicesStatus();
-    });
+      const Duration(seconds: AppConstants.homePingInterval),
+      (timer) {
+        checkAllDevicesStatus();
+      },
+    );
   }
 
   /// updates the status of all devices in [_devices]
@@ -171,14 +177,14 @@ class _HomePageState extends State<HomePage> {
         leading: PopupMenuButton<SortingOrder>(
           icon: AppConstants.sort,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(10.0),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
           ),
           // The menu should appear below the button. The offset is dependent of the selected menu item so the offset is calculated dependent of
           // the current selected menu item.
-          offset: Offset(0,
-              00 + 50.0 * (SortingOrder.values[selectedMenu.index].index + 1)),
+          offset: Offset(
+            0,
+            00 + 50.0 * (SortingOrder.values[selectedMenu.index].index + 1),
+          ),
           initialValue: selectedMenu,
           // Callback that sets the selected popup menu item.
           onSelected: (SortingOrder item) {
@@ -205,23 +211,25 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: ActionButton(
-          onPressed: () async {
-            final newDevice = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DiscoverPage(
-                        updateDevicesList: updateDevicesList,
-                        devices: _devices,
-                      )),
-            );
-            if (newDevice != null) {
-              setState(() {
-                _devicesRaw.add(newDevice);
-              });
-            }
-          },
-          text: AppLocalizations.of(context)!.homeAddDeviceButton,
-          icon: AppConstants.add),
+        onPressed: () async {
+          final newDevice = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DiscoverPage(
+                updateDevicesList: updateDevicesList,
+                devices: _devices,
+              ),
+            ),
+          );
+          if (newDevice != null) {
+            setState(() {
+              _devicesRaw.add(newDevice);
+            });
+          }
+        },
+        text: AppLocalizations.of(context)!.homeAddDeviceButton,
+        icon: AppConstants.add,
+      ),
       body: buildListview(),
     );
   }
@@ -236,8 +244,9 @@ class _HomePageState extends State<HomePage> {
       filterDevicesByType();
       sortDevices();
       if (deviceId != null) {
-        StorageDevice device =
-            devices.firstWhere((element) => element.id == deviceId);
+        StorageDevice device = devices.firstWhere(
+          (element) => element.id == deviceId,
+        );
         // set online state to null because online state is not known yet
         device.isOnline = null;
         checkDeviceStatus(device);
@@ -260,12 +269,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           TextTitle(
             title: AppLocalizations.of(context)!.homeFilterDevicesTitle,
-            children: [
-              SizedBox(
-                height: 50,
-                child: filterDevicesChipsV2(),
-              ),
-            ],
+            children: [SizedBox(height: 50, child: filterDevicesChipsV2())],
           ),
           TextTitle(
             title: AppLocalizations.of(context)!.homeDeviceListTitle,
@@ -278,66 +282,62 @@ class _HomePageState extends State<HomePage> {
 
   /// returns a List of Chips for filtering devices
   ListView filterDevicesChipsV2() {
-    List<CustomChoiceChip<String>> chipsDeviceTypes =
-        AppConstants().getChipsDeviceTypes(context: context);
+    List<CustomChoiceChip<String>> chipsDeviceTypes = AppConstants()
+        .getChipsDeviceTypes(context: context);
     return ListView(
       primary: true,
       shrinkWrap: true,
       scrollDirection: Axis.horizontal,
       children: [
         Wrap(
-            spacing: 5.0,
-            children: List<Widget>.generate(chipsDeviceTypes.length, (index) {
-              String? label = chipsDeviceTypes[index].label;
-              IconData? icon = chipsDeviceTypes[index].icon;
-              return ActionChip(
-                avatar: Icon(icon),
-                label: Row(
-                  children: [
-                    if (label != null) Text(label),
-                  ],
-                ),
-                backgroundColor: deviceTypesValues[index]
+          spacing: 5.0,
+          children: List<Widget>.generate(chipsDeviceTypes.length, (index) {
+            String? label = chipsDeviceTypes[index].label;
+            IconData? icon = chipsDeviceTypes[index].icon;
+            return ActionChip(
+              avatar: Icon(icon),
+              label: Row(children: [if (label != null) Text(label)]),
+              backgroundColor: deviceTypesValues[index]
+                  ? Theme.of(context).colorScheme.secondaryContainer
+                  : Theme.of(context).colorScheme.surface,
+              side: BorderSide(
+                color: deviceTypesValues[index]
                     ? Theme.of(context).colorScheme.secondaryContainer
-                    : Theme.of(context).colorScheme.surface,
-                side: BorderSide(
-                  color: deviceTypesValues[index]
-                      ? Theme.of(context).colorScheme.secondaryContainer
-                      : Theme.of(context).colorScheme.secondary,
-                  width: 1.0,
-                ),
-                // selected: mode == chipsTheme[index].value,
-                onPressed: () {
-                  setState(() {
-                    deviceTypesValues[index] = !deviceTypesValues[index];
-                    filterDevicesByType();
-                  });
-                },
-              );
-            })),
+                    : Theme.of(context).colorScheme.secondary,
+                width: 1.0,
+              ),
+              // selected: mode == chipsTheme[index].value,
+              onPressed: () {
+                setState(() {
+                  deviceTypesValues[index] = !deviceTypesValues[index];
+                  filterDevicesByType();
+                });
+              },
+            );
+          }),
+        ),
       ],
     );
   }
 
-
   /// returns the list of devices
   Widget buildDeviceList() {
     return _isLoading
-        ? const Center(
-            child: CircularProgressIndicator(),
-          )
+        ? const Center(child: CircularProgressIndicator())
         : _devices.isEmpty
-            ? Text(AppLocalizations.of(context)!.homeNoDevices,
-                style: Theme.of(context).textTheme.bodyMedium)
-            : ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _devices.length,
-                itemBuilder: (context, index) {
-                  final device = _devices[index];
-                  return buildDevice(device);
-                },
-              );
+        ? Text(
+            AppLocalizations.of(context)!.homeNoDevices,
+            style: Theme.of(context).textTheme.bodyMedium,
+          )
+        : ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _devices.length,
+            itemBuilder: (context, index) {
+              final device = _devices[index];
+              return buildDevice(device);
+            },
+          );
   }
 
   /// returns a single device card
@@ -373,77 +373,85 @@ class _HomePageState extends State<HomePage> {
       subtitle1 = "${AppConstants.macText}: ${device.macAddress}";
     }
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return deviceInfoDialog(
-              device: device,
-              title: title,
-              subtitle1: subtitle1,
-              subtitle2: subtitle2);
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return deviceInfoDialog(
+          device: device,
+          title: title,
+          subtitle1: subtitle1,
+          subtitle2: subtitle2,
+        );
+      },
+    );
   }
 
   /// returns the actual alert dialog for waking and editing the device
-  Widget deviceInfoDialog(
-      {required StorageDevice device,
-      required String title,
-      required String subtitle1,
-      required String subtitle2}) {
+  Widget deviceInfoDialog({
+    required StorageDevice device,
+    required String title,
+    required String subtitle1,
+    required String subtitle2,
+  }) {
     return customDualChoiceAlertdialog(
-        title: title != "" ? title : null,
-        child: (subtitle1 != "" || subtitle2 != "" || device.isOnline != null)
-            ? Column(
-                children: [
-                  if (device.isOnline != null)
-                    Text(
-                        device.isOnline!
-                            ? AppLocalizations.of(context)!.homeDeviceCardOnline
-                            : AppLocalizations.of(context)!
-                                .homeDeviceCardOffline,
-                        style: TextStyle(
-                            color: device.isOnline!
-                                ? AppConstants.successMessageColor
-                                : Theme.of(context).colorScheme.error)),
-                  if (subtitle1 != "") Text(subtitle1),
-                  if (subtitle2 != "") Text(subtitle2),
-                ],
-              )
-            : null,
-        icon: getIcon(device.deviceType),
-        iconColor: device.isOnline != null
-            ? device.isOnline!
+      title: title != "" ? title : null,
+      child: (subtitle1 != "" || subtitle2 != "" || device.isOnline != null)
+          ? Column(
+              children: [
+                if (device.isOnline != null)
+                  Text(
+                    device.isOnline!
+                        ? AppLocalizations.of(context)!.homeDeviceCardOnline
+                        : AppLocalizations.of(context)!.homeDeviceCardOffline,
+                    style: TextStyle(
+                      color: device.isOnline!
+                          ? AppConstants.successMessageColor
+                          : Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                if (subtitle1 != "") Text(subtitle1),
+                if (subtitle2 != "") Text(subtitle2),
+              ],
+            )
+          : null,
+      icon: getIcon(device.deviceType),
+      iconColor: device.isOnline != null
+          ? device.isOnline!
                 ? AppConstants.successMessageColor
                 : Theme.of(context).colorScheme.error
-            : null,
-        leftText: AppLocalizations.of(context)!.homeDeviceCardWakeButton,
-        rightText: AppLocalizations.of(context)!.homeDeviceCardEditButton,
-        leftIcon: AppConstants.wakeUp,
-        rightIcon: AppConstants.edit,
-        leftOnPressed: () => {Navigator.pop(context), showWakeUpDialog(device)},
-        rightOnPressed: () => {
-              Navigator.of(context).pop(),
-              showCustomBottomSheet(
-                  context: context,
-                  formPage: EditDeviceFormPage(
-                      title: AppLocalizations.of(context)!
-                          .homeEditDeviceAlertTitle,
-                      device: device,
-                      devices: _devices,
-                      onSubmitDeviceCallback: updateDevicesList))
-            });
+          : null,
+      leftText: AppLocalizations.of(context)!.homeDeviceCardWakeButton,
+      rightText: AppLocalizations.of(context)!.homeDeviceCardEditButton,
+      leftIcon: AppConstants.wakeUp,
+      rightIcon: AppConstants.edit,
+      leftOnPressed: () => {Navigator.pop(context), showWakeUpDialog(device)},
+      rightOnPressed: () => {
+        Navigator.of(context).pop(),
+        showCustomBottomSheet(
+          context: context,
+          formPage: EditDeviceFormPage(
+            title: AppLocalizations.of(context)!.homeEditDeviceAlertTitle,
+            device: device,
+            devices: _devices,
+            onSubmitDeviceCallback: updateDevicesList,
+          ),
+        ),
+      },
+    );
   }
 
   /// shows the Alert Dialog for waking the device.
   /// [device] is the device to wake.
   Future<dynamic> showWakeUpDialog(StorageDevice device) {
     return showDialog(
-        context: context,
-        builder: (context) {
-          return StreamBuilder<List<Message>>(
-              stream: sendWolAndGetMessages(
-                  context: context, device: device.toNetworkDevice()),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<Message>> snapshot) {
+      context: context,
+      builder: (context) {
+        return StreamBuilder<List<Message>>(
+          stream: sendWolAndGetMessages(
+            context: context,
+            device: device.toNetworkDevice(),
+          ),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<Message>> snapshot) {
                 // set color, text and icon of dialog box according to the arrived messages
                 Color? color;
                 String rightText = AppLocalizations.of(context)!.cancel;
@@ -480,24 +488,24 @@ class _HomePageState extends State<HomePage> {
                                   color: (message.type == MsgType.error)
                                       ? Theme.of(context).colorScheme.error
                                       : (message.type == MsgType.check ||
-                                              message.type == MsgType.online)
-                                          ? AppConstants.successMessageColor
-                                          : null,
+                                            message.type == MsgType.online)
+                                      ? AppConstants.successMessageColor
+                                      : null,
                                 ),
                               );
                             },
                           ),
                         )
-                      : const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                      : const Center(child: CircularProgressIndicator()),
                   icon: AppConstants.wakeUp,
                   iconColor: color,
                   rightText: rightText,
                   rightIcon: rightIcon,
                   rightOnPressed: () => {Navigator.of(context).pop()},
                 );
-              });
-        });
+              },
+        );
+      },
+    );
   }
 }

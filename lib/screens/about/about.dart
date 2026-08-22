@@ -59,42 +59,43 @@ class _AboutPageState extends State<AboutPage> {
     try {
       if (kIsWeb) {
         deviceData = <String, dynamic>{
-          'Error:': localizations.aboutWebPlatformError
+          'Error:': localizations.aboutWebPlatformError,
         };
       } else {
         switch (defaultTargetPlatform) {
           case TargetPlatform.android:
-            deviceData =
-                _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+            deviceData = _readAndroidBuildData(
+              await deviceInfoPlugin.androidInfo,
+            );
             break;
           case TargetPlatform.iOS:
             deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
             break;
           case TargetPlatform.fuchsia:
             deviceData = <String, dynamic>{
-              'Error:': localizations.aboutFuchsiaPlatformError
+              'Error:': localizations.aboutFuchsiaPlatformError,
             };
             break;
           case TargetPlatform.linux:
             deviceData = <String, dynamic>{
-              'Error:': localizations.aboutLinuxPlatformError
+              'Error:': localizations.aboutLinuxPlatformError,
             };
             break;
           case TargetPlatform.macOS:
             deviceData = <String, dynamic>{
-              'Error:': localizations.aboutMacOSPlatformError
+              'Error:': localizations.aboutMacOSPlatformError,
             };
             break;
           case TargetPlatform.windows:
             deviceData = <String, dynamic>{
-              'Error:': localizations.aboutWindowsPlatformError
+              'Error:': localizations.aboutWindowsPlatformError,
             };
             break;
         }
       }
     } on PlatformException {
       deviceData = <String, dynamic>{
-        'Error:': localizations.aboutNoPlatformDetected
+        'Error:': localizations.aboutNoPlatformDetected,
       };
     }
 
@@ -116,23 +117,17 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
-    return <String, dynamic>{
-      'model': build.model,
-    };
+    return <String, dynamic>{'model': build.model};
   }
 
   Map<String, dynamic> _readIosDeviceInfo(IosDeviceInfo data) {
-    return <String, dynamic>{
-      'utsname.nodename': data.utsname.nodename,
-    };
+    return <String, dynamic>{'utsname.nodename': data.utsname.nodename};
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       body: ListView(
         padding: AppConstants.screenPadding,
         children: [
@@ -144,9 +139,7 @@ class _AboutPageState extends State<AboutPage> {
           ),
           TextTitle(
             title: AppLocalizations.of(context)!.aboutDevice,
-            children: [
-              getDeviceInfoCard(),
-            ],
+            children: [getDeviceInfoCard()],
           ),
           TextTitle(
             title: AppLocalizations.of(context)!.aboutOpenSourceTitle,
@@ -154,8 +147,8 @@ class _AboutPageState extends State<AboutPage> {
               SpacedRow(
                 children: [
                   IconTextButton(
-                    text:
-                        AppLocalizations.of(context)!.aboutOpenSourceCodeButton,
+                    text: AppLocalizations.of(context)!
+                        .aboutOpenSourceCodeButton,
                     icon: AppConstants.sourceCodeIcon,
                     onPressed: () async {
                       await _launchUrl(_url);
@@ -168,7 +161,7 @@ class _AboutPageState extends State<AboutPage> {
                     onPressed: () => {showLicensePage(context: context)},
                   ),
                 ],
-              )
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -177,11 +170,13 @@ class _AboutPageState extends State<AboutPage> {
               VersionText(text: widget.packageInfo.appName),
               VersionText(text: widget.packageInfo.packageName),
               VersionText(
-                  text: AppLocalizations.of(context)!.aboutVersionText(
-                      widget.packageInfo.version,
-                      widget.packageInfo.buildNumber)),
+                text: AppLocalizations.of(context)!.aboutVersionText(
+                  widget.packageInfo.version,
+                  widget.packageInfo.buildNumber,
+                ),
+              ),
             ],
-          )
+          ),
         ],
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
@@ -191,31 +186,32 @@ class _AboutPageState extends State<AboutPage> {
   /// return card with device info
   Widget getDeviceInfoCard() {
     return Card(
-        elevation: 0,
-        color:
-            Theme.of(context).colorScheme.secondaryContainer, //primaryContainer
-        child: InkWell(
-            borderRadius: AppConstants.borderRadius,
-            child: ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: _deviceData.keys.map((String property) {
-                  return Text(_deviceData[property].toString());
-                }).toList(),
-              ),
-              subtitle: Text(
-                "${AppConstants.ipText}: $_wifiAddress",
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              minLeadingWidth: 0,
-              // ignore: sized_box_for_whitespace
-              leading: const SizedBox(
-                height: double.infinity,
-                child: Icon(
-                  Icons.phone_iphone,
-                ),
-              ),
-            )));
+      elevation: 0,
+      color: Theme.of(context)
+          .colorScheme
+          .secondaryContainer, //primaryContainer
+      child: InkWell(
+        borderRadius: AppConstants.borderRadius,
+        child: ListTile(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _deviceData.keys.map((String property) {
+              return Text(_deviceData[property].toString());
+            }).toList(),
+          ),
+          subtitle: Text(
+            "${AppConstants.ipText}: $_wifiAddress",
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          minLeadingWidth: 0,
+          // ignore: sized_box_for_whitespace
+          leading: const SizedBox(
+            height: double.infinity,
+            child: Icon(Icons.phone_iphone),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -227,9 +223,6 @@ class VersionText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(color: Colors.grey),
-    );
+    return Text(text, style: const TextStyle(color: Colors.grey));
   }
 }

@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:swol/l10n/app_localizations.dart';
 
 import 'package:swol/constants.dart';
+
 import '../../services/data.dart';
 import '../../services/database.dart';
 import '../../widgets/chip_cards.dart';
@@ -33,9 +34,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       body: ListView(
         padding: AppConstants.screenPadding,
         children: [
@@ -45,41 +44,45 @@ class _SettingsPageState extends State<SettingsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(AppLocalizations.of(context)!.settingsThemeSelectorTitle,
-                      style: Theme.of(context).textTheme.titleMedium),
-                  const ThemeSwitcher()
+                  Text(
+                    AppLocalizations.of(context)!.settingsThemeSelectorTitle,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const ThemeSwitcher(),
                 ],
               ),
             ],
           ),
           TextTitle(
-              title: AppLocalizations.of(context)!.settingsAppDataTitle,
-              children: [
-                SpacedRow(
-                  children: [
-                    IconTextButton(
-                      text: AppLocalizations.of(context)!.settingsExport,
-                      icon: Icons.arrow_upward_outlined,
-                      onPressed: shareJsonFile,
-                    ),
-                    IconTextButton(
-                      text: AppLocalizations.of(context)!.settingsImport,
-                      icon: Icons.arrow_downward_outlined,
-                      onPressed: importJsonFile,
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    IconTextButton(
-                        text: AppLocalizations.of(context)!.settingsReset,
-                        icon: Icons.delete_forever_outlined,
-                        onPressed: () {
-                          buildResetDialog(context);
-                        }),
-                  ],
-                ),
-              ]),
+            title: AppLocalizations.of(context)!.settingsAppDataTitle,
+            children: [
+              SpacedRow(
+                children: [
+                  IconTextButton(
+                    text: AppLocalizations.of(context)!.settingsExport,
+                    icon: Icons.arrow_upward_outlined,
+                    onPressed: shareJsonFile,
+                  ),
+                  IconTextButton(
+                    text: AppLocalizations.of(context)!.settingsImport,
+                    icon: Icons.arrow_downward_outlined,
+                    onPressed: importJsonFile,
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  IconTextButton(
+                    text: AppLocalizations.of(context)!.settingsReset,
+                    icon: Icons.delete_forever_outlined,
+                    onPressed: () {
+                      buildResetDialog(context);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -88,24 +91,24 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<dynamic> buildResetDialog(BuildContext context) {
     return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return customDualChoiceAlertdialog(
-              title: AppLocalizations.of(context)!.settingsReset,
-              icon: AppConstants.warningIcon,
-              iconColor: Theme.of(context).colorScheme.error,
-              child:
-                  Text(AppLocalizations.of(context)!.settingsResetDialogText),
-              leftText: AppLocalizations.of(context)!.cancel,
-              leftOnPressed: () => Navigator.pop(context),
-              rightText:
-                  AppLocalizations.of(context)!.settingsResetDialogButton,
-              rightOnPressed: () => {
-                    Navigator.pop(context),
-                    deviceStorage.deleteAllDevices(),
-                  },
-              rightColor: Theme.of(context).colorScheme.error);
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return customDualChoiceAlertdialog(
+          title: AppLocalizations.of(context)!.settingsReset,
+          icon: AppConstants.warningIcon,
+          iconColor: Theme.of(context).colorScheme.error,
+          child: Text(AppLocalizations.of(context)!.settingsResetDialogText),
+          leftText: AppLocalizations.of(context)!.cancel,
+          leftOnPressed: () => Navigator.pop(context),
+          rightText: AppLocalizations.of(context)!.settingsResetDialogButton,
+          rightOnPressed: () => {
+            Navigator.pop(context),
+            deviceStorage.deleteAllDevices(),
+          },
+          rightColor: Theme.of(context).colorScheme.error,
+        );
+      },
+    );
   }
 
   // get the file form the user and show an alert dialog
@@ -121,44 +124,51 @@ class _SettingsPageState extends State<SettingsPage> {
 
     if (fileExt != 'json') {
       showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return customDualChoiceAlertdialog(
-              title: AppLocalizations.of(context)!
-                  .settingsResetDialogWrongFormatTitle,
-              iconColor: Theme.of(context).colorScheme.error,
-              child: Text(AppLocalizations.of(context)!
-                  .settingsResetDialogWrongFormatText(fileExt)),
-              icon: AppConstants.warningIcon,
-              rightText: AppLocalizations.of(context)!.ok,
-              rightOnPressed: () => Navigator.pop(context),
-            );
-          });
+        context: context,
+        builder: (BuildContext context) {
+          return customDualChoiceAlertdialog(
+            title: AppLocalizations.of(context)!
+                .settingsResetDialogWrongFormatTitle,
+            iconColor: Theme.of(context).colorScheme.error,
+            child: Text(
+              AppLocalizations.of(context)!
+                  .settingsResetDialogWrongFormatText(fileExt),
+            ),
+            icon: AppConstants.warningIcon,
+            rightText: AppLocalizations.of(context)!.ok,
+            rightOnPressed: () => Navigator.pop(context),
+          );
+        },
+      );
       return;
     }
 
     try {
       final fileContents = await file.readAsString();
       final jsonData = json.decode(fileContents) as List<dynamic>;
-      importedDevices =
-          jsonData.map((item) => StorageDevice.fromJson(item)).toList();
+      importedDevices = jsonData
+          .map((item) => StorageDevice.fromJson(item))
+          .toList();
     } on FileSystemException {
       if (!mounted) return;
 
       showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return customDualChoiceAlertdialog(
-              title: AppLocalizations.of(context)!
-                  .settingsResetDialogWrongJsonFormatTitle,
-              iconColor: Theme.of(context).colorScheme.error,
-              child: Text(AppLocalizations.of(context)!
-                  .settingsResetDialogWrongJsonFormatText),
-              icon: AppConstants.warningIcon,
-              rightText: AppLocalizations.of(context)!.ok,
-              rightOnPressed: () => Navigator.pop(context),
-            );
-          });
+        context: context,
+        builder: (BuildContext context) {
+          return customDualChoiceAlertdialog(
+            title: AppLocalizations.of(context)!
+                .settingsResetDialogWrongJsonFormatTitle,
+            iconColor: Theme.of(context).colorScheme.error,
+            child: Text(
+              AppLocalizations.of(context)!
+                  .settingsResetDialogWrongJsonFormatText,
+            ),
+            icon: AppConstants.warningIcon,
+            rightText: AppLocalizations.of(context)!.ok,
+            rightOnPressed: () => Navigator.pop(context),
+          );
+        },
+      );
 
       return;
     }
@@ -166,25 +176,26 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!mounted) return;
 
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return customDualChoiceAlertdialog(
-            title: AppLocalizations.of(context)!.genericWarning,
-            icon: AppConstants.warningIcon,
-            iconColor: Theme.of(context).colorScheme.error,
-            child: Text(
-                AppLocalizations.of(context)!.settingsResetDialogConfirmText),
-            leftText: AppLocalizations.of(context)!.cancel,
-            leftOnPressed: () => Navigator.pop(context),
-            rightText:
-                AppLocalizations.of(context)!.settingsResetDialogConfirmButton,
-            rightOnPressed: () => {
-              deviceStorage.deleteAllDevices(),
-              deviceStorage.saveDevices(importedDevices),
-              Navigator.pop(context),
-            },
-          );
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return customDualChoiceAlertdialog(
+          title: AppLocalizations.of(context)!.genericWarning,
+          icon: AppConstants.warningIcon,
+          iconColor: Theme.of(context).colorScheme.error,
+          child: Text(
+            AppLocalizations.of(context)!.settingsResetDialogConfirmText,
+          ),
+          leftText: AppLocalizations.of(context)!.cancel,
+          leftOnPressed: () => Navigator.pop(context),
+          rightText: AppLocalizations.of(context)!
+              .settingsResetDialogConfirmButton,
+          rightOnPressed: () => {
+            deviceStorage.deleteAllDevices(),
+            deviceStorage.saveDevices(importedDevices),
+            Navigator.pop(context),
+          },
+        );
+      },
+    );
   }
-
 }

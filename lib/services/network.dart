@@ -9,6 +9,7 @@ import 'package:swol/services/utilities.dart';
 import 'package:wake_on_lan/wake_on_lan.dart';
 
 import 'package:swol/constants.dart';
+
 import 'data.dart';
 
 Stream<NetworkDevice> findDevicesInNetwork(
@@ -66,8 +67,10 @@ Stream<NetworkDevice> findDevicesInNetwork(
 }
 
 /// sends the magic packet to the [device] that should receive a magic wol package in order to get woken up
-Stream<Message> sendWolPackage(
-    {required BuildContext context, required NetworkDevice device}) async* {
+Stream<Message> sendWolPackage({
+  required BuildContext context,
+  required NetworkDevice device,
+}) async* {
   // Validate correct formatting of ip and mac addresses
   String ip = device.ipAddress;
   final mac = device.macAddress;
@@ -80,7 +83,9 @@ Stream<Message> sendWolPackage(
 
     if (result == null) {
       yield Message(
-          text: localizations!.homeWolCardHost(ip), type: MsgType.error);
+        text: localizations!.homeWolCardHost(ip),
+        type: MsgType.error,
+      );
       invalid = true;
     } else {
       ip = result;
@@ -94,7 +99,9 @@ Stream<Message> sendWolPackage(
 
   if (!MACAddress.validate(mac).state) {
     yield Message(
-        text: localizations!.homeWolCardMac(mac), type: MsgType.error);
+      text: localizations!.homeWolCardMac(mac),
+      type: MsgType.error,
+    );
     invalid = true;
   }
 
@@ -102,7 +109,9 @@ Stream<Message> sendWolPackage(
   if (port == null || port < 0 || port > 65535) {
     String portString = port == null ? "" : port.toString();
     yield Message(
-        text: localizations!.homeWolCardPort(portString), type: MsgType.error);
+      text: localizations!.homeWolCardPort(portString),
+      type: MsgType.error,
+    );
     invalid = true;
   }
 
@@ -125,8 +134,9 @@ Stream<Message> sendWolPackage(
   IPAddress ipv4Broadcast = IPAddress(broadcast);
 
   // get localisation string beforehand to avoid using BuildContexts across async gaps
-  String homeWolCardSendWolSuccess =
-      localizations.homeWolCardSendWolSuccess(ip);
+  String homeWolCardSendWolSuccess = localizations.homeWolCardSendWolSuccess(
+    ip,
+  );
   String homeWolCardPingInfo = localizations.homeWolCardPingInfo;
   String homeWolCardPingSuccess = localizations.homeWolCardPingSuccess;
   String homeWolCardPingFail = localizations.homeWolCardPingFail;
@@ -140,7 +150,9 @@ Stream<Message> sendWolPackage(
     yield Message(text: homeWolCardSendWolSuccess, type: MsgType.check);
   } catch (e) {
     yield Message(
-        text: localizations.homeWolCardSendWolFail(ip), type: MsgType.error);
+      text: localizations.homeWolCardSendWolFail(ip),
+      type: MsgType.error,
+    );
   }
 
   // ping device until it is online
@@ -155,8 +167,9 @@ Stream<Message> sendWolPackage(
     // ignore: use_build_context_synchronously
     if (!context.mounted) return;
     yield Message(
-        text: AppLocalizations.of(context)!.homeWolCardPing(tries),
-        type: MsgType.ping);
+      text: AppLocalizations.of(context)!.homeWolCardPing(tries),
+      type: MsgType.ping,
+    );
 
     final ping = Ping(ip, count: 1, timeout: 5);
 
@@ -176,11 +189,15 @@ Stream<Message> sendWolPackage(
 
 /// returns a list of Messages by using the sendWolPackage function
 /// accumulates the messages in a list and yields the list after each message
-Stream<List<Message>> sendWolAndGetMessages(
-    {required BuildContext context, required NetworkDevice device}) async* {
+Stream<List<Message>> sendWolAndGetMessages({
+  required BuildContext context,
+  required NetworkDevice device,
+}) async* {
   List<Message> messages = [];
-  await for (Message message
-      in sendWolPackage(context: context, device: device)) {
+  await for (Message message in sendWolPackage(
+    context: context,
+    device: device,
+  )) {
     // if last message is ping, replace it with the new one
     if (messages.isNotEmpty &&
         messages.last.type == MsgType.ping &&

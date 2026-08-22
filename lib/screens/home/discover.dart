@@ -6,6 +6,7 @@ import 'package:swol/l10n/app_localizations.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 
 import 'package:swol/constants.dart';
+
 import '../../services/data.dart';
 import '../../services/network.dart';
 import '../../widgets/layout_elements.dart';
@@ -16,8 +17,11 @@ class DiscoverPage extends StatefulWidget {
   final Function(List<StorageDevice>, String?) updateDevicesList;
   final List<StorageDevice> devices;
 
-  const DiscoverPage(
-      {super.key, required this.updateDevicesList, required this.devices});
+  const DiscoverPage({
+    super.key,
+    required this.updateDevicesList,
+    required this.devices,
+  });
 
   @override
   State<DiscoverPage> createState() => _DiscoverPageState();
@@ -34,9 +38,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
   String? _subnet;
 
   Future<void> initSubnet() async {
-    String? subnet = await NetworkInfo()
-        .getWifiIP()
-        .then((value) => value?.substring(0, value.lastIndexOf('.')));
+    String? subnet = await NetworkInfo().getWifiIP().then(
+      (value) => value?.substring(0, value.lastIndexOf('.')),
+    );
 
     if (!mounted) return;
 
@@ -72,22 +76,25 @@ class _DiscoverPageState extends State<DiscoverPage> {
       });
     });
 
-    _subscription = stream.listen((device) {
-      if (!mounted) {
-        // Exit the loop if the widget is no longer mounted.
-        _subscription = null;
-        return;
-      }
-      setState(() {
-        _devices.add(device);
-        //_devices.sort();
-        _devices.sort((NetworkDevice a, NetworkDevice b) => -a.compareTo(b));
-      });
-    }, onDone: () {
-      setState(() {
-        _subscription = null;
-      });
-    });
+    _subscription = stream.listen(
+      (device) {
+        if (!mounted) {
+          // Exit the loop if the widget is no longer mounted.
+          _subscription = null;
+          return;
+        }
+        setState(() {
+          _devices.add(device);
+          //_devices.sort();
+          _devices.sort((NetworkDevice a, NetworkDevice b) => -a.compareTo(b));
+        });
+      },
+      onDone: () {
+        setState(() {
+          _subscription = null;
+        });
+      },
+    );
   }
 
   @override
@@ -99,20 +106,20 @@ class _DiscoverPageState extends State<DiscoverPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.discoverTitle),
-      ),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.discoverTitle)),
       floatingActionButton: ActionButton(
-          onPressed: () => showCustomBottomSheet(
-              context: context,
-              formPage: NetworkDeviceFormPage(
-                  title:
-                      AppLocalizations.of(context)!.discoverAddDeviceAlertTitle,
-                  device: NetworkDevice(),
-                  devices: widget.devices,
-                  onSubmitDeviceCallback: widget.updateDevicesList)),
-          text: AppLocalizations.of(context)!.discoverAddCustomDeviceButton,
-          icon: const Icon(Icons.add)),
+        onPressed: () => showCustomBottomSheet(
+          context: context,
+          formPage: NetworkDeviceFormPage(
+            title: AppLocalizations.of(context)!.discoverAddDeviceAlertTitle,
+            device: NetworkDevice(),
+            devices: widget.devices,
+            onSubmitDeviceCallback: widget.updateDevicesList,
+          ),
+        ),
+        text: AppLocalizations.of(context)!.discoverAddCustomDeviceButton,
+        icon: const Icon(Icons.add),
+      ),
       body: buildListview(),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
@@ -131,20 +138,17 @@ class _DiscoverPageState extends State<DiscoverPage> {
       child: Column(
         children: [
           Visibility(
-              visible: _subscription != null,
-              child: LinearProgressIndicator(value: _progress)),
+            visible: _subscription != null,
+            child: LinearProgressIndicator(value: _progress),
+          ),
           Expanded(
             child: ListView(
               padding: AppConstants.screenPaddingScrollView,
               children: [
+                TextTitle(children: [getSubnetInfo()]),
                 TextTitle(
-                  children: [
-                    getSubnetInfo(),
-                  ],
-                ),
-                TextTitle(
-                  title:
-                      AppLocalizations.of(context)!.discoverNetworkDevicesTitle,
+                  title: AppLocalizations.of(context)!
+                      .discoverNetworkDevicesTitle,
                   children: [
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -166,15 +170,18 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                 title: title,
                                 subtitle: subtitle,
                                 onTap: () => showCustomBottomSheet(
-                                    context: context,
-                                    formPage: NetworkDeviceFormPage(
-                                        title: AppLocalizations.of(context)!
-                                            .discoverAddDeviceAlertTitle,
-                                        device: _devices[index]
-                                            .copyWith(wolPort: 9),
-                                        devices: widget.devices,
-                                        onSubmitDeviceCallback:
-                                            widget.updateDevicesList)),
+                                  context: context,
+                                  formPage: NetworkDeviceFormPage(
+                                    title: AppLocalizations.of(context)!
+                                        .discoverAddDeviceAlertTitle,
+                                    device: _devices[index].copyWith(
+                                      wolPort: 9,
+                                    ),
+                                    devices: widget.devices,
+                                    onSubmitDeviceCallback:
+                                        widget.updateDevicesList,
+                                  ),
+                                ),
                               );
                             },
                           ),
@@ -195,22 +202,24 @@ class _DiscoverPageState extends State<DiscoverPage> {
     String subnet =
         _subnet ?? AppLocalizations.of(context)!.discoverCardSubnetNoNetwork;
     return Card(
-        elevation: 0,
-        color:
-            Theme.of(context).colorScheme.secondaryContainer, //primaryContainer
-        child: InkWell(
-            borderRadius: AppConstants.borderRadius,
-            child: ListTile(
-              title: Text(AppLocalizations.of(context)!.discoverCardTitle),
-              subtitle: Text(
-                  "${AppLocalizations.of(context)!.discoverCardSubnet} $subnet"),
-              minLeadingWidth: 0,
-              leading: const SizedBox(
-                height: double.infinity,
-                child: Icon(
-                  Icons.wifi,
-                ),
-              ),
-            )));
+      elevation: 0,
+      color: Theme.of(context)
+          .colorScheme
+          .secondaryContainer, //primaryContainer
+      child: InkWell(
+        borderRadius: AppConstants.borderRadius,
+        child: ListTile(
+          title: Text(AppLocalizations.of(context)!.discoverCardTitle),
+          subtitle: Text(
+            "${AppLocalizations.of(context)!.discoverCardSubnet} $subnet",
+          ),
+          minLeadingWidth: 0,
+          leading: const SizedBox(
+            height: double.infinity,
+            child: Icon(Icons.wifi),
+          ),
+        ),
+      ),
+    );
   }
 }

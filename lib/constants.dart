@@ -60,9 +60,12 @@ class AppConstants {
     ];
     if (context != null) {
       return chipsWolPorts
-          .map((e) => CustomChoiceChip<int>(
+          .map(
+            (e) => CustomChoiceChip<int>(
               label: AppLocalizations.of(context)!.formPort(e.value),
-              value: e.value))
+              value: e.value,
+            ),
+          )
           .toList();
     } else {
       return chipsWolPorts;
@@ -73,78 +76,91 @@ class AppConstants {
   List<CustomChoiceChip<String>> getChipsDeviceTypes({BuildContext? context}) {
     return <CustomChoiceChip<String>>[
       CustomChoiceChip(
-          label: context != null
-              ? AppLocalizations.of(context)!.deviceChoiceServer
-              : null,
-          icon: Icons.storage_rounded,
-          value: 'server'),
+        label: context != null
+            ? AppLocalizations.of(context)!.deviceChoiceServer
+            : null,
+        icon: Icons.storage_rounded,
+        value: 'server',
+      ),
       CustomChoiceChip(
-          label: context != null
-              ? AppLocalizations.of(context)!.deviceChoiceDesktop
-              : null,
-          icon: Icons.desktop_mac_rounded,
-          value: 'desktop'),
+        label: context != null
+            ? AppLocalizations.of(context)!.deviceChoiceDesktop
+            : null,
+        icon: Icons.desktop_mac_rounded,
+        value: 'desktop',
+      ),
       CustomChoiceChip(
-          label: context != null
-              ? AppLocalizations.of(context)!.deviceChoiceLaptop
-              : null,
-          icon: Icons.laptop_mac,
-          value: 'laptop'),
+        label: context != null
+            ? AppLocalizations.of(context)!.deviceChoiceLaptop
+            : null,
+        icon: Icons.laptop_mac,
+        value: 'laptop',
+      ),
       CustomChoiceChip(
-          label: context != null
-              ? AppLocalizations.of(context)!.deviceChoicePrinter
-              : null,
-          icon: Icons.print_rounded,
-          value: 'printer'),
+        label: context != null
+            ? AppLocalizations.of(context)!.deviceChoicePrinter
+            : null,
+        icon: Icons.print_rounded,
+        value: 'printer',
+      ),
       CustomChoiceChip(
-          label: context != null
-              ? AppLocalizations.of(context)!.deviceChoiceNetwork
-              : null,
-          icon: Icons.lan_rounded,
-          value: 'network'),
+        label: context != null
+            ? AppLocalizations.of(context)!.deviceChoiceNetwork
+            : null,
+        icon: Icons.lan_rounded,
+        value: 'network',
+      ),
       CustomChoiceChip(
-          label: context != null
-              ? AppLocalizations.of(context)!.deviceChoiceIOT
-              : null,
-          icon: Icons.smart_toy,
-          value: 'iot'),
+        label: context != null
+            ? AppLocalizations.of(context)!.deviceChoiceIOT
+            : null,
+        icon: Icons.smart_toy,
+        value: 'iot',
+      ),
       CustomChoiceChip(
-          label: context != null
-              ? AppLocalizations.of(context)!.deviceChoiceTv
-              : null,
-          icon: Icons.tv_rounded,
-          value: 'tv'),
+        label: context != null
+            ? AppLocalizations.of(context)!.deviceChoiceTv
+            : null,
+        icon: Icons.tv_rounded,
+        value: 'tv',
+      ),
       CustomChoiceChip(
-          label: context != null
-              ? AppLocalizations.of(context)!.deviceChoiceMobile
-              : null,
-          icon: Icons.phone_iphone,
-          value: 'mobile'),
+        label: context != null
+            ? AppLocalizations.of(context)!.deviceChoiceMobile
+            : null,
+        icon: Icons.phone_iphone,
+        value: 'mobile',
+      ),
       CustomChoiceChip(
-          label: context != null
-              ? AppLocalizations.of(context)!.deviceChoiceOther
-              : null,
-          icon: Icons.tune_rounded,
-          value: 'other'),
+        label: context != null
+            ? AppLocalizations.of(context)!.deviceChoiceOther
+            : null,
+        icon: Icons.tune_rounded,
+        value: 'other',
+      ),
     ];
   }
 
   // Theme Chips
-  List<CustomChoiceChip<AdaptiveThemeMode>> getChipsTheme(
-      {required BuildContext context}) {
+  List<CustomChoiceChip<AdaptiveThemeMode>> getChipsTheme({
+    required BuildContext context,
+  }) {
     return <CustomChoiceChip<AdaptiveThemeMode>>[
       CustomChoiceChip(
-          label: AppLocalizations.of(context)!.settingsThemeSelectorSystem,
-          icon: Icons.brightness_4_rounded,
-          value: AdaptiveThemeMode.system),
+        label: AppLocalizations.of(context)!.settingsThemeSelectorSystem,
+        icon: Icons.brightness_4_rounded,
+        value: AdaptiveThemeMode.system,
+      ),
       CustomChoiceChip(
-          label: AppLocalizations.of(context)!.settingsThemeSelectorLight,
-          icon: Icons.brightness_5_rounded,
-          value: AdaptiveThemeMode.light),
+        label: AppLocalizations.of(context)!.settingsThemeSelectorLight,
+        icon: Icons.brightness_5_rounded,
+        value: AdaptiveThemeMode.light,
+      ),
       CustomChoiceChip(
-          label: AppLocalizations.of(context)!.settingsThemeSelectorDark,
-          icon: Icons.brightness_2_rounded,
-          value: AdaptiveThemeMode.dark)
+        label: AppLocalizations.of(context)!.settingsThemeSelectorDark,
+        icon: Icons.brightness_2_rounded,
+        value: AdaptiveThemeMode.dark,
+      ),
     ];
   }
 
@@ -160,9 +176,17 @@ class AppConstants {
       'https://github.com/herzhenr/simple-wake-on-lan';
 
   /// Other
-  static const screenPadding =
-      EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 0);
-  static const screenPaddingScrollView =
-      EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 80);
+  static const screenPadding = EdgeInsets.only(
+    left: 20,
+    right: 20,
+    top: 0,
+    bottom: 0,
+  );
+  static const screenPaddingScrollView = EdgeInsets.only(
+    left: 20,
+    right: 20,
+    top: 0,
+    bottom: 80,
+  );
   static BorderRadius borderRadius = BorderRadius.circular(10);
 }

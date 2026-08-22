@@ -42,9 +42,13 @@ class DeviceStorage {
   /// Adds a new device to the list of devices
   /// [device] the device to add
   Future<(List<StorageDevice>, StorageDevice)> addDevice(
-      NetworkDevice device, List<StorageDevice> devices) async {
-    final storageDevice =
-        device.toStorageDevice(id: const Uuid().v1(), modified: DateTime.now());
+    NetworkDevice device,
+    List<StorageDevice> devices,
+  ) async {
+    final storageDevice = device.toStorageDevice(
+      id: const Uuid().v1(),
+      modified: DateTime.now(),
+    );
     final updatedDevices = [...devices, storageDevice];
     await saveDevices(updatedDevices);
     return (updatedDevices, storageDevice);
@@ -54,7 +58,9 @@ class DeviceStorage {
   /// [updatedDevice] the device to update
   /// [devices] the list of all devices
   Future<(List<StorageDevice>, StorageDevice)> updateDevice(
-      StorageDevice updatedDevice, List<StorageDevice> devices) async {
+    StorageDevice updatedDevice,
+    List<StorageDevice> devices,
+  ) async {
     final updatedDevices = devices.map((device) {
       if (device.id == updatedDevice.id) {
         return updatedDevice.copyWith(modified: DateTime.now());
@@ -68,9 +74,12 @@ class DeviceStorage {
   /// Deletes a device from the list of devices
   /// [deviceId] the id of the device to delete
   Future<List<StorageDevice>> deleteDevice(
-      String deviceId, List<StorageDevice> devices) async {
-    final updatedDevices =
-        devices.where((device) => device.id != deviceId).toList();
+    String deviceId,
+    List<StorageDevice> devices,
+  ) async {
+    final updatedDevices = devices
+        .where((device) => device.id != deviceId)
+        .toList();
     await saveDevices(updatedDevices);
     return updatedDevices;
   }

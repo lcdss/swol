@@ -7,12 +7,13 @@ abstract class Device implements Comparable<NetworkDevice> {
   final int? wolPort;
   final String? deviceType;
 
-  Device(
-      {required this.hostName,
-      required this.ipAddress,
-      required this.macAddress,
-      this.wolPort,
-      this.deviceType});
+  Device({
+    required this.hostName,
+    required this.ipAddress,
+    required this.macAddress,
+    this.wolPort,
+    this.deviceType,
+  });
 
   Device copyWith({
     String? id,
@@ -32,15 +33,16 @@ class StorageDevice extends Device {
   final DateTime modified;
   bool? isOnline;
 
-  StorageDevice(
-      {required super.hostName,
-      required super.ipAddress,
-      required super.macAddress,
-      super.wolPort,
-      super.deviceType,
-      required this.id,
-      required this.modified,
-      this.isOnline});
+  StorageDevice({
+    required super.hostName,
+    required super.ipAddress,
+    required super.macAddress,
+    super.wolPort,
+    super.deviceType,
+    required this.id,
+    required this.modified,
+    this.isOnline,
+  });
 
   @override
   int compareTo(NetworkDevice other) {
@@ -107,12 +109,13 @@ class StorageDevice extends Device {
 }
 
 class NetworkDevice extends Device {
-  NetworkDevice(
-      {super.hostName = '',
-      super.ipAddress = '',
-      super.macAddress = '',
-      super.wolPort,
-      super.deviceType});
+  NetworkDevice({
+    super.hostName = '',
+    super.ipAddress = '',
+    super.macAddress = '',
+    super.wolPort,
+    super.deviceType,
+  });
 
   @override
   int compareTo(NetworkDevice other) {

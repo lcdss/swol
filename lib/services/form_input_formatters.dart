@@ -11,16 +11,19 @@ class CustomSeparatorFormatter extends TextInputFormatter {
 
   final bool autoSeparate;
 
-  CustomSeparatorFormatter(
-      {this.separators = "",
-      this.allowPasteWithoutFormatting = true,
-      this.autoSeparate = true,
-      required this.allowedInput,
-      this.preferredSeparator = ""});
+  CustomSeparatorFormatter({
+    this.separators = "",
+    this.allowPasteWithoutFormatting = true,
+    this.autoSeparate = true,
+    required this.allowedInput,
+    this.preferredSeparator = "",
+  });
 
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     //assert(autoSeparate == false || separator!.length == 1);
     final int currentLength = oldValue.text.length;
     final int inputLength = newValue.text.length;
@@ -47,13 +50,13 @@ class CustomSeparatorFormatter extends TextInputFormatter {
       if (separators.contains(inputText.substring(inputLength - 1))) {
         preferredSeparator = inputText.substring(inputLength - 1);
         // replace every occurrence of any separator with preferred separator
-        final String newText = oldValue.text
-            .replaceAll(RegExp('[$separators]'), preferredSeparator);
+        final String newText = oldValue.text.replaceAll(
+          RegExp('[$separators]'),
+          preferredSeparator,
+        );
         return TextEditingValue(
           text: newText,
-          selection: TextSelection.collapsed(
-            offset: oldValue.selection.end,
-          ),
+          selection: TextSelection.collapsed(offset: oldValue.selection.end),
         );
       }
 
@@ -73,8 +76,9 @@ class CustomSeparatorFormatter extends TextInputFormatter {
           );
         }
         for (int i = 0; i < separators.length; i++) {
-          if (allowedInput
-              .hasMatch('$inputText${separators.substring(i, i + 1)}')) {
+          if (allowedInput.hasMatch(
+            '$inputText${separators.substring(i, i + 1)}',
+          )) {
             return TextEditingValue(
               text: '$inputText$separators',
               selection: TextSelection.collapsed(
@@ -94,9 +98,7 @@ class CustomSeparatorFormatter extends TextInputFormatter {
         final selectionIndex = newValue.selection.end - 1;
         return TextEditingValue(
           text: newValue.text.substring(0, newValue.text.length - 1),
-          selection: TextSelection.collapsed(
-            offset: selectionIndex,
-          ),
+          selection: TextSelection.collapsed(offset: selectionIndex),
         );
       }
     }
@@ -108,17 +110,17 @@ class CustomSeparatorFormatter extends TextInputFormatter {
 
 class MACAddressFormatter extends CustomSeparatorFormatter {
   MACAddressFormatter({super.allowPasteWithoutFormatting})
-      : super(
-          separators: ':-',
-          preferredSeparator: ':',
-          allowedInput: RegExp(AppConstants.macSubStringValidationRegex),
-        );
+    : super(
+        separators: ':-',
+        preferredSeparator: ':',
+        allowedInput: RegExp(AppConstants.macSubStringValidationRegex),
+      );
 }
 
 class IPAddressFormatter extends CustomSeparatorFormatter {
   IPAddressFormatter({super.allowPasteWithoutFormatting})
-      : super(
-          allowedInput: RegExp(AppConstants.ipSubStringValidationRegex),
-          autoSeparate: false,
-        );
+    : super(
+        allowedInput: RegExp(AppConstants.ipSubStringValidationRegex),
+        autoSeparate: false,
+      );
 }

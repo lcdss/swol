@@ -9,6 +9,7 @@ import 'package:swol/screens/home/discover.dart';
 import 'package:swol/screens/home/home.dart';
 import 'package:swol/services/data.dart';
 import 'package:swol/widgets/layout_elements.dart';
+
 import '../../services/database.dart';
 import '../../services/form_input_formatters.dart';
 import '../../widgets/chip_cards.dart';
@@ -21,13 +22,14 @@ abstract class ModularBottomFormPage extends StatefulWidget {
   final Function(List<StorageDevice>, String?) onSubmitDeviceCallback;
   final bool deleteButton;
 
-  ModularBottomFormPage(
-      {super.key,
-      required this.device,
-      required this.devices,
-      required this.title,
-      required this.onSubmitDeviceCallback,
-      this.deleteButton = false});
+  ModularBottomFormPage({
+    super.key,
+    required this.device,
+    required this.devices,
+    required this.title,
+    required this.onSubmitDeviceCallback,
+    this.deleteButton = false,
+  });
 
   // text controllers for the text input fields
   final TextEditingController controllerName = TextEditingController();
@@ -48,20 +50,22 @@ abstract class ModularBottomFormPage extends StatefulWidget {
 
   /// creates a [NetworkDevice] or [StorageDevice] class out of the currently stored inputs in the TextEditingControllers
   Device get getDevice {
-    final wolPort =
-        controllerPort.text.isEmpty ? null : int.parse(controllerPort.text);
+    final wolPort = controllerPort.text.isEmpty
+        ? null
+        : int.parse(controllerPort.text);
     final deviceType = controllerIcon.text.isEmpty ? null : controllerIcon.text;
     if (device is StorageDevice) {
       final storageDevice = device as StorageDevice;
       return StorageDevice(
-          id: storageDevice.id,
-          hostName: controllerName.text,
-          ipAddress: controllerIp.text,
-          macAddress: controllerMac.text,
-          modified: DateTime.now(),
-          wolPort: wolPort,
-          isOnline: storageDevice.isOnline,
-          deviceType: deviceType);
+        id: storageDevice.id,
+        hostName: controllerName.text,
+        ipAddress: controllerIp.text,
+        macAddress: controllerMac.text,
+        modified: DateTime.now(),
+        wolPort: wolPort,
+        isOnline: storageDevice.isOnline,
+        deviceType: deviceType,
+      );
     } else {
       return NetworkDevice(
         hostName: controllerName.text,
@@ -83,8 +87,10 @@ abstract class ModularBottomFormPage extends StatefulWidget {
   /// dataOperationOnDelete() is triggered when the delete button is pressed and delete a device from the json file and returns the updated [StorageDevice] list
   Future<List<StorageDevice>> dataOperationOnDelete() async {
     StorageDevice device = getDevice as StorageDevice;
-    List<StorageDevice> devices =
-        await deviceStorage.deleteDevice(device.id, this.devices);
+    List<StorageDevice> devices = await deviceStorage.deleteDevice(
+      device.id,
+      this.devices,
+    );
     return devices;
   }
 
@@ -96,8 +102,8 @@ abstract class ModularBottomFormPage extends StatefulWidget {
 
 class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   // set label of chipsWolPorts to the translated string
-  late List<CustomChoiceChip<int>> chipsWolPorts =
-      AppConstants().getChipsWolPorts(context: context);
+  late List<CustomChoiceChip<int>> chipsWolPorts = AppConstants()
+      .getChipsWolPorts(context: context);
 
   // variables for the chip selectors and initial port value
   int? indexWolSelector;
@@ -107,23 +113,27 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   void initState() {
     super.initState();
 
-    widget.controllerIp =
-        RichTextController(onMatch: (List<String> match) {}, targetMatches: [
-      MatchTargetItem(
-        regex: AppConstants().ipPattern,
-        style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
-        allowInlineMatching: true,
-      ),
-    ]);
+    widget.controllerIp = RichTextController(
+      onMatch: (List<String> match) {},
+      targetMatches: [
+        MatchTargetItem(
+          regex: AppConstants().ipPattern,
+          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+          allowInlineMatching: true,
+        ),
+      ],
+    );
 
-    widget.controllerMac =
-        RichTextController(onMatch: (List<String> match) {}, targetMatches: [
-      MatchTargetItem(
-        regex: AppConstants().macPattern,
-        style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
-        allowInlineMatching: true,
-      ),
-    ]);
+    widget.controllerMac = RichTextController(
+      onMatch: (List<String> match) {},
+      targetMatches: [
+        MatchTargetItem(
+          regex: AppConstants().macPattern,
+          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+          allowInlineMatching: true,
+        ),
+      ],
+    );
 
     // initialize the text controllers
     widget.controllerName.text = widget.device.hostName;
@@ -131,8 +141,9 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
     widget.controllerMac.text = widget.device.macAddress;
 
     // initialize the port text controller and the chip selector. AppConstants().chipsWolPorts
-    final wolElement = widget.chipWolPorts
-        .where((element) => element.value == widget.device.wolPort);
+    final wolElement = widget.chipWolPorts.where(
+      (element) => element.value == widget.device.wolPort,
+    );
     if (wolElement.isNotEmpty) {
       indexWolSelector = widget.chipWolPorts.indexOf(wolElement.first);
     }
@@ -141,8 +152,9 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
     }
 
     // initialize the icon selector
-    final deviceType = widget.chipDeviceTypes
-        .where((element) => element.value == widget.device.deviceType);
+    final deviceType = widget.chipDeviceTypes.where(
+      (element) => element.value == widget.device.deviceType,
+    );
     if (deviceType.isNotEmpty) {
       indexIconSelector = widget.chipDeviceTypes.indexOf(deviceType.first);
     }
@@ -165,7 +177,11 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
       },
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-            20, 15, 20, MediaQuery.of(context).viewInsets.bottom),
+          20,
+          15,
+          20,
+          MediaQuery.of(context).viewInsets.bottom,
+        ),
         child: ListView(
           primary: true,
           shrinkWrap: true,
@@ -185,26 +201,32 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
               label: AppLocalizations.of(context)!.formNameHint,
               formKey: widget.formKeyName,
               controller: widget.controllerName,
-              validator: createValidator(AppConstants.nameValidationRegex,
-                  AppLocalizations.of(context)!.formNameError),
+              validator: createValidator(
+                AppConstants.nameValidationRegex,
+                AppLocalizations.of(context)!.formNameError,
+              ),
             ),
             getCustomTextFormField(
-                label: AppLocalizations.of(context)!.formIpHint,
-                formKey: widget.formKeyIp,
-                controller: widget.controllerIp,
-                validator: createValidator(AppConstants.ipValidationRegex,
-                    AppLocalizations.of(context)!.formIpError),
-                inputFormatters: [IPAddressFormatter()]),
-            getCustomTextFormField(
-                label: AppLocalizations.of(context)!.formMacHint,
-                formKey: widget.formKeyMac,
-                controller: widget.controllerMac,
-                validator: createValidator(AppConstants.macValidationRegex,
-                    AppLocalizations.of(context)!.formMacError),
-                inputFormatters: [MACAddressFormatter()]),
-            const SizedBox(
-              height: 20,
+              label: AppLocalizations.of(context)!.formIpHint,
+              formKey: widget.formKeyIp,
+              controller: widget.controllerIp,
+              validator: createValidator(
+                AppConstants.ipValidationRegex,
+                AppLocalizations.of(context)!.formIpError,
+              ),
+              inputFormatters: [IPAddressFormatter()],
             ),
+            getCustomTextFormField(
+              label: AppLocalizations.of(context)!.formMacHint,
+              formKey: widget.formKeyMac,
+              controller: widget.controllerMac,
+              validator: createValidator(
+                AppConstants.macValidationRegex,
+                AppLocalizations.of(context)!.formMacError,
+              ),
+              inputFormatters: [MACAddressFormatter()],
+            ),
+            const SizedBox(height: 20),
             buildPortSelector(textTheme),
             buildIconSelector(textTheme),
             if (widget.deleteButton) buildDeleteButton(),
@@ -221,18 +243,23 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
       child: Transform.translate(
         offset: const Offset(0, 0),
         child: ActionButton(
-            onPressed: () => {
-                  validateFormFields(onSubmitDeviceCallback: () async {
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                    (List<StorageDevice>, StorageDevice) updatedDevices =
-                        await widget.dataOperationOnSave();
-                    // sent device to callback function in order to update the UI
-                    widget.onSubmitDeviceCallback(
-                        updatedDevices.$1, updatedDevices.$2.id);
-                  })
-                },
-            text: AppLocalizations.of(context)!.formApplyButtonText,
-            icon: const Icon(AppConstants.formIcon)),
+          onPressed: () => {
+            validateFormFields(
+              onSubmitDeviceCallback: () async {
+                Navigator.popUntil(context, (route) => route.isFirst);
+                (List<StorageDevice>, StorageDevice) updatedDevices =
+                    await widget.dataOperationOnSave();
+                // sent device to callback function in order to update the UI
+                widget.onSubmitDeviceCallback(
+                  updatedDevices.$1,
+                  updatedDevices.$2.id,
+                );
+              },
+            ),
+          },
+          text: AppLocalizations.of(context)!.formApplyButtonText,
+          icon: const Icon(AppConstants.formIcon),
+        ),
       ),
     );
   }
@@ -270,15 +297,19 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
             iconColor: Theme.of(context).colorScheme.error,
             child: Column(
               children: errorMessage
-                  .map((error) => Row(children: [
+                  .map(
+                    (error) => Row(
+                      children: [
                         Icon(
                           AppConstants.formInvalidArgument,
                           size: 15,
                           color: Theme.of(context).colorScheme.error,
                         ),
                         const SizedBox(width: 5),
-                        Text(error)
-                      ]))
+                        Text(error),
+                      ],
+                    ),
+                  )
                   .toList(),
             ),
             leftText: AppLocalizations.of(context)!.back,
@@ -300,11 +331,13 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   Center dragIndicator() {
     return Center(
       child: Container(
-          height: 5.0,
-          width: 40.0,
-          decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: const BorderRadius.all(Radius.circular(8.0)))),
+        height: 5.0,
+        width: 40.0,
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+        ),
+      ),
     );
   }
 
@@ -313,13 +346,14 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   /// * [controller] the TextEditingController of the text form field
   /// * [validator] a validator function which can be created with [createValidator]
   /// * [onSaved] the onSaved function called when the form is saved
-  Widget getCustomTextFormField(
-      {String? label,
-      required TextEditingController controller,
-      required GlobalKey<FormState> formKey,
-      String? Function(String?)? validator,
-      String? Function(String?)? onSaved,
-      List<TextInputFormatter>? inputFormatters}) {
+  Widget getCustomTextFormField({
+    String? label,
+    required TextEditingController controller,
+    required GlobalKey<FormState> formKey,
+    String? Function(String?)? validator,
+    String? Function(String?)? onSaved,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(top: 20.0),
       child: Form(
@@ -336,7 +370,8 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
             labelText: label,
             errorStyle: const TextStyle(height: 0.1),
             border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(12.0))),
+              borderRadius: BorderRadius.all(Radius.circular(12.0)),
+            ),
           ),
         ),
       ),
@@ -353,43 +388,44 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(AppLocalizations.of(context)!.formPortLabel,
-                style: textTheme.labelLarge),
+            Text(
+              AppLocalizations.of(context)!.formPortLabel,
+              style: textTheme.labelLarge,
+            ),
             SizedBox(
               height: 45,
               child: Wrap(
-                  spacing: 5.0,
-                  children:
-                      List<Widget>.generate(chipsWolPorts.length, (index) {
-                    String? label = chipsWolPorts[index].label;
-                    IconData? icon = chipsWolPorts[index].icon;
-                    return ChoiceChip(
-                      label: IntrinsicWidth(
-                        child: Row(
-                          children: [
-                            if (label != null) Text(label),
-                            if (icon != null) const SizedBox(width: 10.0),
-                            if (icon != null) Icon(icon),
-                          ],
-                        ),
+                spacing: 5.0,
+                children: List<Widget>.generate(chipsWolPorts.length, (index) {
+                  String? label = chipsWolPorts[index].label;
+                  IconData? icon = chipsWolPorts[index].icon;
+                  return ChoiceChip(
+                    label: IntrinsicWidth(
+                      child: Row(
+                        children: [
+                          if (label != null) Text(label),
+                          if (icon != null) const SizedBox(width: 10.0),
+                          if (icon != null) Icon(icon),
+                        ],
                       ),
-                      side: widget.formKeyPort.currentState?.validate() == false
-                          ? BorderSide(
-                              color: Theme.of(context).colorScheme.error,
-                            )
-                          : null,
-                      selected: indexWolSelector == index,
-                      onSelected: (bool selected) {
-                        setState(() {
-                          indexWolSelector = selected ? index : null;
-                          (selected)
-                              ? widget.controllerPort.text =
-                                  chipsWolPorts[index].value.toString()
-                              : widget.controllerPort.text = '';
-                        });
-                      },
-                    );
-                  })),
+                    ),
+                    side: widget.formKeyPort.currentState?.validate() == false
+                        ? BorderSide(color: Theme.of(context).colorScheme.error)
+                        : null,
+                    selected: indexWolSelector == index,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        indexWolSelector = selected ? index : null;
+                        (selected)
+                            ? widget.controllerPort.text = chipsWolPorts[index]
+                                  .value
+                                  .toString()
+                            : widget.controllerPort.text = '';
+                      });
+                    },
+                  );
+                }),
+              ),
             ),
           ],
         ),
@@ -399,8 +435,10 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
             label: AppLocalizations.of(context)!.formPortHint,
             formKey: widget.formKeyPort,
             controller: widget.controllerPort,
-            validator: createValidator(AppConstants.portValidationRegex,
-                AppLocalizations.of(context)!.formPortError),
+            validator: createValidator(
+              AppConstants.portValidationRegex,
+              AppLocalizations.of(context)!.formPortError,
+            ),
             onSaved: (String? value) {
               // TODO ugly
               setState(() {
@@ -423,14 +461,16 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   /// returns a custom selector for the icon of the device
   /// * [textTheme] the text theme of the current context
   Column buildIconSelector(TextTheme textTheme) {
-    List<CustomChoiceChip<String>> chipsDeviceTypes =
-        AppConstants().getChipsDeviceTypes(context: context);
+    List<CustomChoiceChip<String>> chipsDeviceTypes = AppConstants()
+        .getChipsDeviceTypes(context: context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text(AppLocalizations.of(context)!.formIconLabel,
-            style: textTheme.labelLarge),
+        Text(
+          AppLocalizations.of(context)!.formIconLabel,
+          style: textTheme.labelLarge,
+        ),
         const SizedBox(height: 3.0),
         SizedBox(
           height: 45,
@@ -440,41 +480,42 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
             scrollDirection: Axis.horizontal,
             children: [
               Wrap(
-                  spacing: 5.0,
-                  runSpacing: 0.0,
-                  children:
-                      List<Widget>.generate(chipsDeviceTypes.length, (index) {
-                    String? label = chipsDeviceTypes[index].label;
-                    IconData? icon = chipsDeviceTypes[index].icon;
-                    return ChoiceChip(
-                      label: IntrinsicWidth(
-                        child: Row(
-                          children: [
-                            if (label != null) Text(label),
-                            if (icon != null) const SizedBox(width: 10.0),
-                            if (icon != null) Icon(icon),
-                          ],
-                        ),
+                spacing: 5.0,
+                runSpacing: 0.0,
+                children: List<Widget>.generate(chipsDeviceTypes.length, (
+                  index,
+                ) {
+                  String? label = chipsDeviceTypes[index].label;
+                  IconData? icon = chipsDeviceTypes[index].icon;
+                  return ChoiceChip(
+                    label: IntrinsicWidth(
+                      child: Row(
+                        children: [
+                          if (label != null) Text(label),
+                          if (icon != null) const SizedBox(width: 10.0),
+                          if (icon != null) Icon(icon),
+                        ],
                       ),
-                      side: indexIconSelector == null
-                          ? BorderSide(
-                              color: Theme.of(context).colorScheme.error,
-                            )
-                          : null,
-                      selected: indexIconSelector == index,
-                      onSelected: (bool selected) {
-                        setState(() {
-                          indexIconSelector = selected ? index : null;
-                          if (selected) {
-                            widget.controllerIcon.text =
-                                chipsDeviceTypes[index].value.toString();
-                          } else {
-                            widget.controllerIcon.text = '';
-                          }
-                        });
-                      },
-                    );
-                  }).toList()),
+                    ),
+                    side: indexIconSelector == null
+                        ? BorderSide(color: Theme.of(context).colorScheme.error)
+                        : null,
+                    selected: indexIconSelector == index,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        indexIconSelector = selected ? index : null;
+                        if (selected) {
+                          widget.controllerIcon.text = chipsDeviceTypes[index]
+                              .value
+                              .toString();
+                        } else {
+                          widget.controllerIcon.text = '';
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
             ],
           ),
         ),
@@ -485,12 +526,12 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
             child: Text(
               AppLocalizations.of(context)!.formIconError,
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.error, fontSize: 12),
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 12,
+              ),
             ),
           ),
-        const SizedBox(
-          height: 15,
-        )
+        const SizedBox(height: 15),
       ],
     );
   }
@@ -503,14 +544,17 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.error,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
         ),
         onPressed: () {
           showDeleteDialog();
         },
-        child: Text(AppLocalizations.of(context)!.formDeleteAlertTitle,
-            style: const TextStyle(color: Colors.white)),
+        child: Text(
+          AppLocalizations.of(context)!.formDeleteAlertTitle,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
@@ -523,16 +567,21 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
           title: AppLocalizations.of(context)!.formDeleteAlertTitle,
           icon: Icons.delete_outlined,
           iconColor: Theme.of(context).colorScheme.error,
-          child: Text.rich(TextSpan(
-            children: <TextSpan>[
-              TextSpan(text: AppLocalizations.of(context)!.formDeleteAlertText),
-              if (widget.controllerName.text.isNotEmpty)
+          child: Text.rich(
+            TextSpan(
+              children: <TextSpan>[
                 TextSpan(
+                  text: AppLocalizations.of(context)!.formDeleteAlertText,
+                ),
+                if (widget.controllerName.text.isNotEmpty)
+                  TextSpan(
                     text: widget.controllerName.text,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-              const TextSpan(text: '?'),
-            ],
-          )),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                const TextSpan(text: '?'),
+              ],
+            ),
+          ),
           leftText: AppLocalizations.of(context)!.cancel,
           leftOnPressed: () {
             Navigator.of(context).pop();
@@ -549,40 +598,40 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
       },
     );
   }
-
 }
 
 /// An implementation of the [ModularBottomFormPage] for adding a new [NetworkDevice] from the [DiscoverPage]
 class NetworkDeviceFormPage extends ModularBottomFormPage {
-  NetworkDeviceFormPage(
-      {super.key,
-      required super.device,
-      required super.devices,
-      required super.title,
-      required super.onSubmitDeviceCallback});
+  NetworkDeviceFormPage({
+    super.key,
+    required super.device,
+    required super.devices,
+    required super.title,
+    required super.onSubmitDeviceCallback,
+  });
 
   @override
   Future<(List<StorageDevice>, StorageDevice)> dataOperationOnSave() async {
-    (List<StorageDevice>, StorageDevice) updatedDevices =
-        await deviceStorage.addDevice(getDevice as NetworkDevice, devices);
+    (List<StorageDevice>, StorageDevice) updatedDevices = await deviceStorage
+        .addDevice(getDevice as NetworkDevice, devices);
     return updatedDevices;
   }
 }
 
 /// An implementation of the [ModularBottomFormPage] for editing an already existing [StorageDevice] from the [HomePage]
 class EditDeviceFormPage extends ModularBottomFormPage {
-  EditDeviceFormPage(
-      {super.key,
-      required super.device,
-      required super.title,
-      required super.devices,
-      required super.onSubmitDeviceCallback})
-      : super(deleteButton: true);
+  EditDeviceFormPage({
+    super.key,
+    required super.device,
+    required super.title,
+    required super.devices,
+    required super.onSubmitDeviceCallback,
+  }) : super(deleteButton: true);
 
   @override
   Future<(List<StorageDevice>, StorageDevice)> dataOperationOnSave() async {
-    (List<StorageDevice>, StorageDevice) updatedDevices =
-        await deviceStorage.updateDevice(getDevice as StorageDevice, devices);
+    (List<StorageDevice>, StorageDevice) updatedDevices = await deviceStorage
+        .updateDevice(getDevice as StorageDevice, devices);
     return updatedDevices;
   }
 }
