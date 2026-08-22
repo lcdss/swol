@@ -1,0 +1,36 @@
+lib/main.dart
+  s_7efe093dbda125::t_1085f0ef4c1160 78-79
+lib/widgets/universal_ui_components.dart
+  s_7efe093dbda125::t_1085f0ef4c1160 14
+  s_7efe093dbda125::t_6c9f12193cc736 92,94-95
+lib/screens/home/bottom_sheet_form.dart
+  s_7efe093dbda125::t_6c9f12193cc736 50-51,108,119,132,144,463-464
+  s_7efe093dbda125::t_1085f0ef4c1160 183
+lib/constants.dart
+  s_7efe093dbda125::t_6c9f12193cc736 54-55,58,78-118,122,168
+lib/screens/home/home.dart
+  s_7efe093dbda125::t_1085f0ef4c1160 25,52,54-56,58-64,107-109,123,179-180,182-183,280,284,290-294
+  s_7efe093dbda125::t_6c9f12193cc736 265-266
+  s_7efe093dbda125::t_54057bbf94de89 3
+  s_7efe093dbda125::t_1d2a558b004cc4 4
+lib/widgets/layout_elements.dart
+  s_7efe093dbda125::t_6c9f12193cc736 27,122
+lib/widgets/chip_cards.dart
+  s_7efe093dbda125::t_6c9f12193cc736 20-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "daabcf200d3f2092abce02d5256fd19a59e00312",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
