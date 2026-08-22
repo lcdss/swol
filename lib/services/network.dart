@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:dart_ping/dart_ping.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:swol/l10n/app_localizations.dart';
 import 'package:swol/services/utilities.dart';
 import 'package:wake_on_lan/wake_on_lan.dart';
 
