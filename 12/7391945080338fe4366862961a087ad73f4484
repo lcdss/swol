@@ -1,0 +1,26 @@
+lib/services/database.dart
+  s_7efe093dbda125::t_b87e161d7bd357 10-11
+lib/screens/home/discover.dart
+  s_7efe093dbda125::t_97f4f06a8742cf 103
+lib/screens/home/bottom_sheet_form.dart
+  s_7efe093dbda125::t_b87e161d7bd357 25,34-38,40-42,53-65,70-99,104,115,127-129,131-133,137,140,144-145,149,152,156-165,202-203,211-212,221-222,251,274,277,280,283,412,422,435-436,510,574,576,591-593,605,614-616,621,630-632,638
+  s_7efe093dbda125::t_97f4f06a8742cf 420,507
+lib/services/data.dart
+  s_7efe093dbda125::t_8be5fff6566f18 3,48,121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "127391945080338fe4366862961a087ad73f4484",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
