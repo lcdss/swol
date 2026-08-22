@@ -62,36 +62,27 @@ class _AboutPageState extends State<AboutPage> {
           'Error:': localizations.aboutWebPlatformError,
         };
       } else {
-        switch (defaultTargetPlatform) {
-          case TargetPlatform.android:
-            deviceData = _readAndroidBuildData(
-              await deviceInfoPlugin.androidInfo,
-            );
-            break;
-          case TargetPlatform.iOS:
-            deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
-            break;
-          case TargetPlatform.fuchsia:
-            deviceData = <String, dynamic>{
-              'Error:': localizations.aboutFuchsiaPlatformError,
-            };
-            break;
-          case TargetPlatform.linux:
-            deviceData = <String, dynamic>{
-              'Error:': localizations.aboutLinuxPlatformError,
-            };
-            break;
-          case TargetPlatform.macOS:
-            deviceData = <String, dynamic>{
-              'Error:': localizations.aboutMacOSPlatformError,
-            };
-            break;
-          case TargetPlatform.windows:
-            deviceData = <String, dynamic>{
-              'Error:': localizations.aboutWindowsPlatformError,
-            };
-            break;
-        }
+        deviceData = switch (defaultTargetPlatform) {
+          TargetPlatform.android => _readAndroidBuildData(
+            await deviceInfoPlugin.androidInfo,
+          ),
+          TargetPlatform.fuchsia => {
+            'Error:': localizations.aboutFuchsiaPlatformError,
+          },
+          TargetPlatform.linux => {
+            'Error:': localizations.aboutLinuxPlatformError,
+          },
+          TargetPlatform.macOS => {
+            'Error:': localizations.aboutMacOSPlatformError,
+          },
+          TargetPlatform.windows => {
+            'Error:': localizations.aboutWindowsPlatformError,
+          },
+          // Android is the only target that ships. The wildcard also means a
+          // TargetPlatform added by a future SDK degrades to a message here
+          // instead of failing to compile.
+          _ => {'Error:': localizations.aboutNoPlatformDetected},
+        };
       }
     } on PlatformException {
       deviceData = <String, dynamic>{
@@ -118,10 +109,6 @@ class _AboutPageState extends State<AboutPage> {
 
   Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
     return <String, dynamic>{'model': build.model};
-  }
-
-  Map<String, dynamic> _readIosDeviceInfo(IosDeviceInfo data) {
-    return <String, dynamic>{'utsname.nodename': data.utsname.nodename};
   }
 
   @override
