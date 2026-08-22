@@ -55,15 +55,3 @@ class ThemeSwitcher extends StatelessWidget {
     );
   }
 }
-
-Widget getIconChip({name = String}) {
-  return IntrinsicWidth(
-    child: Row(
-      children: [
-        Text(name),
-        const SizedBox(width: 10.0),
-        const Icon(Icons.check_circle_outline)
-      ],
-    ),
-  );
-}

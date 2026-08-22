@@ -42,28 +42,14 @@ class _SettingsPageState extends State<SettingsPage> {
           TextTitle(
             title: AppLocalizations.of(context)!.settingsAppearanceTitle,
             children: [
-              // TextSubtitle can't be used as it is a Stateless widget and getThemeSelector() is Stateful when the theme changes
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(AppLocalizations.of(context)!.settingsThemeSelectorTitle,
                       style: Theme.of(context).textTheme.titleMedium),
-                  const ThemeSwitcher() //getThemeSelector()
+                  const ThemeSwitcher()
                 ],
               ),
-
-              /// TODO Switch to toggle between system colors and app colors (Also define section to choose app colors)
-              // TextSubtitle(
-              //     title: AppLocalizations.of(context)!.settingsSystemColorsText,
-              //     child: Switch(
-              //       thumbIcon: thumbIcon,
-              //       value: colors,
-              //       onChanged: (bool value) {
-              //         setState(() {
-              //           colors = value;
-              //         });
-              //       },
-              //     ))
             ],
           ),
           TextTitle(
@@ -201,48 +187,4 @@ class _SettingsPageState extends State<SettingsPage> {
         });
   }
 
-  // Widget getThemeSelector() {
-  //   List<CustomChoiceChip<AdaptiveThemeMode>> chipsTheme =
-  //       AppConstants().getChipsTheme(context: context);
-  //
-  //   return ValueListenableBuilder(
-  //     valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
-  //     builder: (_, mode, child) {
-  //       // update your UI
-  //       return Wrap(
-  //           spacing: 5.0,
-  //           children: List<Widget>.generate(chipsTheme.length, (index) {
-  //             String? label = chipsTheme[index].label;
-  //             return ChoiceChip(
-  //               label: Row(
-  //                 children: [
-  //                   if (label != null) Text(label),
-  //                   //if (icon != null) const SizedBox(width: 10.0),
-  //                   //if (icon != null) Icon(icon),
-  //                 ],
-  //               ),
-  //               selected: mode == chipsTheme[index].value,
-  //               onSelected: (bool selected) {
-  //                 // setState(() {
-  //                 //   themeValue = index; //selected ? index : null;
-  //                 // });
-  //                 AdaptiveTheme.of(context)
-  //                     .setThemeMode(chipsTheme[index].value);
-  //               },
-  //             );
-  //           }));
-  //     },
-  //   );
-  // }
-
-  // final MaterialStateProperty<Icon?> thumbIcon =
-  //     MaterialStateProperty.resolveWith<Icon?>(
-  //   (Set<MaterialState> states) {
-  //     // Thumb icon when the switch is selected.
-  //     if (states.contains(MaterialState.selected)) {
-  //       return const Icon(AppConstants.checkIcon);
-  //     }
-  //     return const Icon(AppConstants.denyIcon);
-  //   },
-  // );
 }

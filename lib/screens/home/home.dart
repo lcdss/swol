@@ -319,42 +319,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// returns a List of Chips for filtering devices
-  ListView filterDevicesChipsV1() {
-    List<CustomChoiceChip<String>> chipsDeviceTypes =
-        AppConstants().getChipsDeviceTypes(context: context);
-    return ListView(
-      primary: true,
-      shrinkWrap: true,
-      scrollDirection: Axis.horizontal,
-      children: [
-        Wrap(
-            spacing: 5.0,
-            children: List<Widget>.generate(chipsDeviceTypes.length, (index) {
-              String? label = chipsDeviceTypes[index].label;
-              IconData? icon = chipsDeviceTypes[index].icon;
-              return ChoiceChip(
-                label: IntrinsicWidth(
-                  child: Row(
-                    children: [
-                      if (label != null) Text(label),
-                      if (icon != null) const SizedBox(width: 10.0),
-                      if (icon != null) Icon(icon),
-                    ],
-                  ),
-                ),
-                selected: deviceTypesValues[index],
-                onSelected: (bool selected) {
-                  setState(() {
-                    deviceTypesValues[index] = selected;
-                    filterDevicesByType();
-                  });
-                },
-              );
-            })),
-      ],
-    );
-  }
 
   /// returns the list of devices
   Widget buildDeviceList() {

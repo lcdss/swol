@@ -213,22 +213,4 @@ class _DiscoverPageState extends State<DiscoverPage> {
               ),
             )));
   }
-
-  void showBottomSheet(
-      {required String title, required NetworkDevice device, int? port}) {
-    showModalBottomSheet<dynamic>(
-      isScrollControlled: true,
-      // only expand the bottom sheet to 85% of the screen height
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.85,
-      ),
-      context: context,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      builder: (context) => NetworkDeviceFormPage(
-          title: title,
-          device: device.copyWith(wolPort: port),
-          devices: widget.devices,
-          onSubmitDeviceCallback: widget.updateDevicesList),
-    );
-  }
 }

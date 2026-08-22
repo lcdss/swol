@@ -34,24 +34,6 @@ class TextTitle extends StatelessWidget {
   }
 }
 
-///
-class TextSubtitle extends StatelessWidget {
-  final String title;
-  final Widget child;
-
-  const TextSubtitle({super.key, required this.title, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium),
-        child
-      ],
-    );
-  }
-}
 
 /// A TextBox in the form of a Material Card with text in it
 class TextBox extends StatelessWidget {

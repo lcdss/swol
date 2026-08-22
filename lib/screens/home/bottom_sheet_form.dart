@@ -550,19 +550,6 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
     );
   }
 
-  /// returns a custom choice chip with the given text and icon
-  /// * [updateValue] the value which is updated when the chip is selected
-  /// * [text] the text of the chip
-  /// * [icon] the icon of the chip
-  Row buildChoiceChipContent(int? updateValue, String text, {IconData? icon}) {
-    return Row(
-      children: [
-        Text(text),
-        if (icon != null) const SizedBox(width: 10.0),
-        if (icon != null) Icon(icon),
-      ],
-    );
-  }
 }
 
 /// An implementation of the [ModularBottomFormPage] for adding a new [NetworkDevice] from the [DiscoverPage]
