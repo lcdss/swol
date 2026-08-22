@@ -1,7 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Sockets for the magic packet and the ICMP probes. ACCESS_WIFI_STATE
+         and ACCESS_NETWORK_STATE, which network_info_plus needs for
+         getWifiIP, are merged in from that plugin's own manifest. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="swol"
         android:name="${applicationName}"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
@@ -42,6 +48,4 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
-
-    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
