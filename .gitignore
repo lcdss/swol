@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /android/build
+
+# Generated localizations (emitted into lib/l10n by `flutter pub get`)
+/lib/l10n/app_localizations*.dart
