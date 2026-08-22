@@ -1,0 +1,20 @@
+mise.toml
+  s_7efe093dbda125::t_4a7c51567ccd42 1-3,5
+  s_7efe093dbda125::t_a69e1540faf9bb 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "fcc93658b85c1de2660d6828b0d51123c18f516c",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
