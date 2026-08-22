@@ -1,0 +1,50 @@
+lib/screens/settings/settings.dart
+  s_7efe093dbda125::t_44b8e8dcd581d2 6
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 4
+test/widget_test.dart
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 8
+lib/constants.dart
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 1
+  s_7efe093dbda125::t_44b8e8dcd581d2 4
+lib/widgets/universal_ui_components.dart
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 1
+lib/screens/home/bottom_sheet_form.dart
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 1
+  s_7efe093dbda125::t_44b8e8dcd581d2 4
+lib/screens/home/discover.dart
+  s_7efe093dbda125::t_44b8e8dcd581d2 5
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 3
+lib/widgets/layout_elements.dart
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 1
+lib/screens/about/about.dart
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 4
+  s_7efe093dbda125::t_44b8e8dcd581d2 8
+lib/main.dart
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 1
+  s_7efe093dbda125::t_18e2566bcff120 47
+  s_7efe093dbda125::t_44b8e8dcd581d2 5
+lib/widgets/chip_cards.dart
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 1
+lib/services/network.dart
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 4
+  s_7efe093dbda125::t_44b8e8dcd581d2 7
+lib/screens/home/home.dart
+  s_7efe093dbda125::t_b6b6ee1e5bdf52 3
+  s_7efe093dbda125::t_44b8e8dcd581d2 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "af72633671946bf9995b9670599e68ad399a450d",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
