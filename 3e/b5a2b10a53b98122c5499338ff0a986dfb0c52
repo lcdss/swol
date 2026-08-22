@@ -1,0 +1,22 @@
+lib/main.dart
+  s_7efe093dbda125::t_7309e2e7250320 108-114,117-119
+  s_7efe093dbda125::t_c5631dc7bc48e4 37-45
+lib/constants.dart
+  s_7efe093dbda125::t_8962559006a849 9-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "3eb5a2b10a53b98122c5499338ff0a986dfb0c52",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
