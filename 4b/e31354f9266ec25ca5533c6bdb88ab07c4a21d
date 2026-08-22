@@ -1,0 +1,19 @@
+lib/screens/about/about.dart
+  s_7efe093dbda125::t_da2a0032d0452f 65-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "4be31354f9266ec25ca5533c6bdb88ab07c4a21d",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
