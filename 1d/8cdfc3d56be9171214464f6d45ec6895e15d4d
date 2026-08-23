@@ -1,0 +1,19 @@
+lib/screens/home/discover.dart
+  s_7efe093dbda125::t_688bc4c7839cc9 34-55,103-110,143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "1d8cdfc3d56be9171214464f6d45ec6895e15d4d",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "unknown"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
