@@ -1,0 +1,21 @@
+.github/workflows/lint.yml
+  s_7efe093dbda125::t_2ed443dd1d84e9 9-13,19,22,35-37
+.github/workflows/build.yml
+  s_7efe093dbda125::t_1789fea1edb950 2,5-7,13-16,21,23,31,39-41,52-57,61,65,101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "3efbbfd5ba7d36c1083f22e0c46b5884d98e22ac",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
