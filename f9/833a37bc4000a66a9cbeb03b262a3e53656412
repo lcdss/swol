@@ -1,0 +1,23 @@
+.github/workflows/build.yml
+  s_7efe093dbda125::t_0be4feacfb5b87 84-88,91,93-94,96,100
+android/app/build.gradle.kts
+  s_7efe093dbda125::t_68e9ab2878e446 13-14,16-21
+android/app/src/main/AndroidManifest.xml
+  s_7efe093dbda125::t_c593408ba45e75 7-8,12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "f9833a37bc4000a66a9cbeb03b262a3e53656412",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
