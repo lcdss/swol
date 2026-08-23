@@ -1,0 +1,23 @@
+lib/services/network.dart
+  s_7efe093dbda125::t_55ae0c66088333 12-37,40-45,47-55,58,61-64,68-69
+test/services/network_test.dart
+  s_7efe093dbda125::t_23bc5c9e183ea2 90-150
+lib/screens/home/discover.dart
+  s_7efe093dbda125::t_d1c36343f46681 89-91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "05fb8fa3ee072af66b5ad0ae71d9a4bf5d8294b2",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
