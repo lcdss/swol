@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.2] - 26-08-23
+
+### Fixed
+
+- the device type selector still showed its error before any interaction; it
+  is now a real form field validating on interaction, like the text fields
+- typing a port number now highlights the matching quick-select chip; that
+  sync was wired to a callback nothing invoked
+
 ## [1.3.1] - 26-08-23
 
 Bug-fix pass over the whole app after a full review.
