@@ -1,0 +1,31 @@
+lib/services/form_input_formatters.dart
+  s_7efe093dbda125::t_f63c142816ab96 79-81,83
+test/screens/bottom_sheet_form_test.dart
+  s_7efe093dbda125::t_81197ba0b39a85 1-68,70-74,87-103
+  s_7efe093dbda125::t_79739c50affcdf 69
+  s_7efe093dbda125::t_eee67045bc921b 75-86
+test/services/form_input_formatters_test.dart
+  s_7efe093dbda125::t_923018d3d57a86 66-77
+lib/screens/home/bottom_sheet_form.dart
+  s_7efe093dbda125::t_65c4ebba9c2c7c 421-423
+  s_7efe093dbda125::t_4619aaa0a4c638 79-81
+  s_7efe093dbda125::t_e77df2e7463200 448
+  s_7efe093dbda125::t_6590a50833d917 370-372
+  s_7efe093dbda125::t_653f4647c3d218 70-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "76a38f08d98c2a37b2bb898e6e6d741114d7c807",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
