@@ -1,0 +1,50 @@
+test/widget_test.dart
+  s_7efe093dbda125::t_14cc2cb7cb3ae9 33-35
+  s_7efe093dbda125::t_965c664805b3d1 8-9
+  s_7efe093dbda125::t_1765b07d9a4584 52-53,60-62,68-69,72-75,80-85,88,91,94-101,106,110,115-117,120,124-125,131
+  s_7efe093dbda125::t_29528109eb25d3 76-79
+  s_7efe093dbda125::t_dd41c74ed92a99 23-26,123,127-128,130,133-136
+  s_7efe093dbda125::t_b1a22c993d9824 1,3-4,6-7,11-17,19-21,28-32,36-51,54-59,63-67,70-71,86-87,89-90,93,102-105,107-109,111-114,118-119,121-122
+  s_7efe093dbda125::t_38f62cd377fa50 92
+test/services/database_test.dart
+  s_7efe093dbda125::t_34a30cb9d01794 112-120,164,193
+  s_7efe093dbda125::t_085d3cf6625094 1-111,121-163,165-192,194-200
+test/services/data_test.dart
+  s_7efe093dbda125::t_34a30cb9d01794 42-50
+  s_7efe093dbda125::t_098f3687c6d696 1-41,51-132
+pubspec.yaml
+  s_7efe093dbda125::t_fb2fd5a5a706d9 64-66
+test/services/network_test.dart
+  s_7efe093dbda125::t_6e6261bcb2c7be 1-40,43-48,51-56,58-79,82-104
+  s_7efe093dbda125::t_34a30cb9d01794 41-42,49-50,57,80-81
+test/services/utilities_test.dart
+  s_7efe093dbda125::t_34a30cb9d01794 18-19
+  s_7efe093dbda125::t_fa8cb78f33ff73 45-54
+  s_7efe093dbda125::t_ff33bb81650d43 1-17,20-44,55-68
+test/services/form_input_formatters_test.dart
+  s_7efe093dbda125::t_3d67fca02003a7 1-70,75-103,105-127
+  s_7efe093dbda125::t_34a30cb9d01794 71-74,104
+test/screens/message_text_test.dart
+  s_7efe093dbda125::t_8256fe17ff8f80 1-64
+test/widgets/device_card_test.dart
+  s_7efe093dbda125::t_64e9b92cda6227 1-8,11-47,49-109,113-129,133-141
+  s_7efe093dbda125::t_34a30cb9d01794 9-10,48,110-112,130-132
+pubspec.lock
+  s_7efe093dbda125::t_322ee30ce22d15 529,649
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "9719494c2a03e07b0dcc77e9f24000925379ad16",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
