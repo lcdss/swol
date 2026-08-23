@@ -76,11 +76,11 @@ class CustomSeparatorFormatter extends TextInputFormatter {
           );
         }
         for (int i = 0; i < separators.length; i++) {
-          if (allowedInput.hasMatch(
-            '$inputText${separators.substring(i, i + 1)}',
-          )) {
+          final separator = separators.substring(i, i + 1);
+
+          if (allowedInput.hasMatch('$inputText$separator')) {
             return TextEditingValue(
-              text: '$inputText$separators',
+              text: '$inputText$separator',
               selection: TextSelection.collapsed(
                 offset: newValue.selection.end + 1,
               ),

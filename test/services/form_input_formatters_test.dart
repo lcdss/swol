@@ -63,6 +63,18 @@ void main() {
       );
     });
 
+    test('falls back to a separator the preferred one cannot satisfy', () {
+      // Regression: this branch used to append the whole separator set
+      // ('AA:-') instead of the one that matched.
+      final formatter = CustomSeparatorFormatter(
+        separators: ':-',
+        preferredSeparator: ':',
+        allowedInput: RegExp(r'^(?:[0-9A-Fa-f]{2}-)*[0-9A-Fa-f]{0,2}$'),
+      );
+
+      expect(formatter.formatEditUpdate(value('A'), value('AA')).text, 'AA-');
+    });
+
     test('lets a paste through without reformatting', () {
       final formatter = MACAddressFormatter();
 

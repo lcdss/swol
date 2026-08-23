@@ -67,11 +67,18 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   int? indexWolSelector;
   int? indexIconSelector;
 
+  bool get _portTextInvalid {
+    final text = _controllerPort.text;
+
+    return text.isNotEmpty &&
+        !RegExp(AppConstants.portValidationRegex).hasMatch(text);
+  }
+
   /// The device as the form currently describes it.
   Device get _editedDevice {
-    final wolPort = _controllerPort.text.isEmpty
-        ? null
-        : int.parse(_controllerPort.text);
+    // tryParse: "save with errors" lets junk through, and a throw here would
+    // be silently lost after the sheet has already been popped.
+    final wolPort = int.tryParse(_controllerPort.text);
     final deviceType = _controllerIcon.text.isEmpty
         ? null
         : _controllerIcon.text;
@@ -360,7 +367,9 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
         key: formKey,
         child: TextFormField(
           inputFormatters: inputFormatters,
-          autovalidateMode: AutovalidateMode.always,
+          // Not `always`: that painted every field red the moment the form
+          // opened, before the user had touched anything.
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: validator,
           controller: controller,
           onSaved: onSaved,
@@ -409,7 +418,9 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
                         ],
                       ),
                     ),
-                    side: _formKeyPort.currentState?.validate() == false
+                    // Checked directly: calling validate() during build
+                    // force-displayed the field errors the form opens with.
+                    side: _portTextInvalid
                         ? BorderSide(color: Theme.of(context).colorScheme.error)
                         : null,
                     selected: indexWolSelector == index,
@@ -434,6 +445,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
             label: AppLocalizations.of(context)!.formPortHint,
             formKey: _formKeyPort,
             controller: _controllerPort,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: createValidator(
               AppConstants.portValidationRegex,
               AppLocalizations.of(context)!.formPortError,
