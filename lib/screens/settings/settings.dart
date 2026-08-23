@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'package:swol/l10n/app_localizations.dart';
@@ -63,8 +64,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     ValueListenableBuilder<bool>(
                       valueListenable: useDynamicColor,
-                      builder: (context, enabled, _) =>
-                          Switch(value: enabled, onChanged: setUseDynamicColor),
+                      builder: (context, enabled, _) => Switch(
+                        value: enabled,
+                        onChanged: (value) {
+                          setUseDynamicColor(value);
+                          // AdaptiveTheme ignores rebuilt light/dark params;
+                          // runtime theme changes go through its manager.
+                          AdaptiveTheme.of(context).setTheme(
+                            light: appLightTheme(value),
+                            dark: appDarkTheme(value),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

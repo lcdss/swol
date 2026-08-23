@@ -2,6 +2,8 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:swol/constants.dart';
+
 /// Whether the app follows the system's Material You palette. A global
 /// notifier so the running MaterialApp rebuilds when Settings flips it.
 final useDynamicColor = ValueNotifier<bool>(true);
@@ -29,6 +31,24 @@ Future<void> loadThemeSettings() async {
     // No plugin (tests, desktop) or no palette: the seed fallback covers it.
   }
 }
+
+/// The themes the app runs with: the wallpaper palette when available and
+/// enabled, the seed palette otherwise. Single source for the startup
+/// AdaptiveTheme config and the Settings toggle's runtime setTheme call.
+ThemeData appLightTheme(bool dynamicOn) => ThemeData(
+  colorScheme: dynamicOn && lightDynamicScheme != null
+      ? lightDynamicScheme!
+      : ColorScheme.fromSeed(seedColor: AppConstants.seedColor),
+);
+
+ThemeData appDarkTheme(bool dynamicOn) => ThemeData(
+  colorScheme: dynamicOn && darkDynamicScheme != null
+      ? darkDynamicScheme!
+      : ColorScheme.fromSeed(
+          seedColor: AppConstants.seedColor,
+          brightness: Brightness.dark,
+        ),
+);
 
 Future<void> setUseDynamicColor(bool value) async {
   useDynamicColor.value = value;

@@ -40,39 +40,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: useDynamicColor,
-      builder: (context, dynamicOn, _) {
-        final lightScheme = dynamicOn && lightDynamicScheme != null
-            ? lightDynamicScheme!
-            : ColorScheme.fromSeed(seedColor: AppConstants.seedColor);
-        final darkScheme = dynamicOn && darkDynamicScheme != null
-            ? darkDynamicScheme!
-            : ColorScheme.fromSeed(
-                seedColor: AppConstants.seedColor,
-                brightness: Brightness.dark,
-              );
-
-        return AdaptiveTheme(
-          light: ThemeData(colorScheme: lightScheme),
-          dark: ThemeData(colorScheme: darkScheme),
-          initial: savedThemeMode ?? AdaptiveThemeMode.system,
-          builder: (ThemeData light, ThemeData dark) => MaterialApp(
-            onGenerateTitle: (context) =>
-                AppLocalizations.of(context)!.appTitle,
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              ...GlobalMaterialLocalizations.delegates,
-            ],
-            supportedLocales: const [
-              Locale('en'), // English
-            ],
-            theme: light,
-            darkTheme: dark,
-            home: MyHomePage(packageInfo: packageInfo),
-          ),
-        );
-      },
+    // AdaptiveTheme captures light/dark in its own State and ignores them on
+    // rebuild, so there is no point rebuilding here when the toggle flips --
+    // the Settings switch applies changes through its manager's setTheme.
+    return AdaptiveTheme(
+      light: appLightTheme(useDynamicColor.value),
+      dark: appDarkTheme(useDynamicColor.value),
+      initial: savedThemeMode ?? AdaptiveThemeMode.system,
+      builder: (ThemeData light, ThemeData dark) => MaterialApp(
+        onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          ...GlobalMaterialLocalizations.delegates,
+        ],
+        supportedLocales: const [
+          Locale('en'), // English
+        ],
+        theme: light,
+        darkTheme: dark,
+        home: MyHomePage(packageInfo: packageInfo),
+      ),
     );
   }
 }
