@@ -1,0 +1,35 @@
+lib/screens/home/discover.dart
+  s_758a1ac5f34d3e::t_a3eff8b4e2e1ef 72-73
+lib/services/form_input_formatters.dart
+  s_758a1ac5f34d3e::t_3de9a5a326db23 128-133
+lib/services/network.dart
+  s_758a1ac5f34d3e::t_06cf932bffac27 49-52,72-95,186-192
+lib/services/utilities.dart
+  s_758a1ac5f34d3e::t_24e67fefb7272e 17-33,35-37,39-40,67-68
+lib/services/widget_sync.dart
+  s_758a1ac5f34d3e::t_5b3ad0f81765fa 29-32
+test/services/form_input_formatters_test.dart
+  s_758a1ac5f34d3e::t_809d9fe4400eaf 113-138
+test/services/network_test.dart
+  s_758a1ac5f34d3e::t_8cc42c17851413 257-285
+test/services/utilities_test.dart
+  s_758a1ac5f34d3e::t_df0b4e2d7fb5fe 157-177
+test/services/widget_sync_test.dart
+  s_758a1ac5f34d3e::t_f613c6228af8a2 42-45,53-62,68-71,83-86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "b866cb60a870e807a030b84331485164de179310",
+  "prompts": {},
+  "sessions": {
+    "s_758a1ac5f34d3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3f378449-03c2-4956-bb24-5363ed45308b",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
