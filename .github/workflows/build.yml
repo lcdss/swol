@@ -1,18 +1,26 @@
 name: Build
+
 on:
   push:
+    # Deliberately excludes a `+build` suffix. The release step below tags with
+    # the full pubspec version (e.g. v1.2.1+1), and secrets.TOKEN is a PAT, so
+    # tags it creates do trigger workflows -- a broader pattern would loop.
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
   workflow_dispatch:
 
+env:
+  # Keep in step with mise.toml and lint.yml.
+  FLUTTER_VERSION: 3.47.0
+
 jobs:
   release-android:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: zulu
           java-version: 21
@@ -20,6 +28,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
@@ -27,13 +36,9 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
 
-      - name: Create local.properties
-        run: |
-          echo "minSdkVersion=28" >> android/local.properties
-          echo "targetSdkVersion=35" >> android/local.properties
-          echo "compileSdkVersion=35" >> android/local.properties
-          echo "ndkVersion=27.2.12479018" >> android/local.properties
-
+      # storeFile is resolved relative to android/app, where the signing config
+      # lives. compileSdk/targetSdk/minSdk/ndkVersion are in the build file --
+      # they used to be injected here, which meant no one could build a clone.
       - name: Create key.properties
         run: |
           echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
@@ -44,13 +49,20 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Analyze project source
+        run: dart analyze --fatal-infos
+
+      - name: Run tests
+        run: flutter test
+
       - name: Build Flutter (App Bundle)
         run: flutter build appbundle --release
 
+      # The Flutter Gradle Plugin adds 1000 * ABI_VERSION to versionCode here.
       - name: Build Flutter (APK)
         run: flutter build apk --release --split-per-abi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Releases
           path: |

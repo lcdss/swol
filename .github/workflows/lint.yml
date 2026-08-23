@@ -6,14 +6,20 @@ on:
   pull_request:
     branches: [ '**' ]
 
+env:
+  # Keep in step with mise.toml. Floating on `channel: stable` is what let the
+  # project drift into building against an SDK its lockfile had never seen.
+  FLUTTER_VERSION: 3.47.0
+
 jobs:
   dart-lint:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
       - run: flutter --version
@@ -26,3 +32,6 @@ jobs:
 
       - name: Analyze project source
         run: dart analyze --fatal-infos
+
+      - name: Run tests
+        run: flutter test
