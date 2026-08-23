@@ -1,0 +1,28 @@
+lib/screens/home/bottom_sheet_form.dart
+  s_7efe093dbda125::t_ed77e629b2a781 449-454,456
+  s_7efe093dbda125::t_403052db558e47 278-296
+  s_7efe093dbda125::t_135a3336a5e44e 191-197
+  s_7efe093dbda125::t_dcd6743ef920d7 198-213,216-223,225-232,234-238,367-380
+  s_7efe093dbda125::t_c7d1798daf85a3 356,361,366
+  s_7efe093dbda125::t_e41a1ac505c476 467-470,473-510,512-534,536-544,547-549
+  s_7efe093dbda125::t_79b9195b7ea414 239
+  s_7efe093dbda125::t_ffae2957e27700 61-63
+test/screens/bottom_sheet_form_test.dart
+  s_7efe093dbda125::t_d8fde49c78cd36 67-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "7d372b48e99e4629f724c3a778abf163f0d4c60c",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
