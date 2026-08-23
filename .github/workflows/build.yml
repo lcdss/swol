@@ -2,13 +2,17 @@ name: Build
 
 on:
   push:
-    # Deliberately excludes a `+build` suffix. The release step below tags with
-    # the full pubspec version (e.g. v1.2.1+1), and secrets.TOKEN is a PAT, so
-    # tags it creates do trigger workflows -- a broader pattern would loop.
+    # Deliberately excludes a `+build` suffix: the release step below tags with
+    # the full pubspec version (e.g. v1.3.0+2), so this never matches the tag
+    # the release itself creates.
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
   workflow_dispatch:
+
+# For creating the release and its tag.
+permissions:
+  contents: write
 
 env:
   # Keep in step with mise.toml and lint.yml.
@@ -98,4 +102,6 @@ jobs:
         with:
           artifacts: "build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk,build/app/outputs/flutter-apk/app-arm64-v8a-release.apk,build/app/outputs/flutter-apk/app-x86_64-release.apk,build/app/outputs/bundle/release/app-release.aab"
           tag: v${{ env.VERSION }}
-          token: ${{ secrets.TOKEN }}
+          # The built-in token, so there is no PAT to expire -- the previous one
+          # did, and every release silently failed with 401 once it had.
+          token: ${{ secrets.GITHUB_TOKEN }}
