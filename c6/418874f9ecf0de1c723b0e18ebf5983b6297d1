@@ -1,0 +1,20 @@
+.github/workflows/build.yml
+  s_7efe093dbda125::t_d29fae222d0dd3 82-92,94,102
+  s_7efe093dbda125::t_3f7e6c07f4a3c7 5-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "c6418874f9ecf0de1c723b0e18ebf5983b6297d1",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
