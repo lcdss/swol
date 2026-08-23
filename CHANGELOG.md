@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1] - 26-08-23
+
+### Fixed
+
+- the System Colors switch now applies immediately; it only took effect on
+  the next app start before
+
 ## [1.4.0] - 26-08-23
 
 ### Added
