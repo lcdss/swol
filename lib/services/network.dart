@@ -92,8 +92,10 @@ Stream<NetworkDevice> findDevicesInNetwork(
   return controller.stream;
 }
 
-/// sends the magic packet to the [device] that should receive a magic wol package in order to get woken up
-Stream<Message> sendWolPackage({
+/// Validates [device] and sends its magic packets -- unicast, plus the
+/// subnet broadcast when the target is local. Ends with [WolSent] or
+/// [WolSendFailed], or [WolInvalid] when validation fails.
+Stream<Message> sendWakePackets({
   required NetworkDevice device,
   WifiNetwork wifi = wifiNetwork,
 }) async* {
@@ -197,6 +199,32 @@ Stream<Message> sendWolPackage({
     yield WolSent(ip);
   } catch (_) {
     yield WolSendFailed(ip);
+  }
+}
+
+/// Sends the wake packets, then pings [device] until it answers, reporting
+/// every step. The widget's background callback uses [sendWakePackets]
+/// directly: the confirmation loop would keep a headless engine alive for
+/// minutes.
+Stream<Message> sendWolPackage({
+  required NetworkDevice device,
+  WifiNetwork wifi = wifiNetwork,
+}) async* {
+  Message outcome = const WolInvalid();
+
+  await for (final message in sendWakePackets(device: device, wifi: wifi)) {
+    outcome = message;
+    yield message;
+  }
+
+  final ip = switch (outcome) {
+    WolSent(:final ip) => ip,
+    WolSendFailed(:final ip) => ip,
+    _ => null,
+  };
+
+  if (ip == null) {
+    return;
   }
 
   // ping device until it is online

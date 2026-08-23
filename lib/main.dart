@@ -10,7 +10,7 @@ import 'package:swol/screens/about/about.dart';
 import 'package:swol/screens/home/home.dart';
 import 'package:swol/screens/settings/settings.dart';
 import 'package:swol/services/theme_settings.dart';
-import 'package:swol/services/widget_service.dart';
+import 'package:swol/services/widget_callback.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

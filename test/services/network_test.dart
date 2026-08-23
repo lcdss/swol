@@ -166,6 +166,16 @@ void main() {
       expect(messages.last, isA<PingSucceeded>());
     }, timeout: const Timeout(Duration(minutes: 1)));
 
+    test('sendWakePackets ends at the send, without the ping loop', () async {
+      final messages = await sendWakePackets(
+        device: device(ipAddress: '127.0.0.1'),
+        wifi: () async => (ip: '10.0.0.5', submask: '255.0.0.0'),
+      ).toList();
+
+      expect(messages.last, isA<WolSent>());
+      expect(messages.whereType<PingStarted>(), isEmpty);
+    }, timeout: const Timeout(Duration(minutes: 1)));
+
     test('sends the packet with a SecureOn password', () async {
       final messages = await sendWolPackage(
         device: device(

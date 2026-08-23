@@ -13,6 +13,7 @@ import 'package:swol/screens/home/discover.dart';
 import '../../services/data.dart';
 import '../../services/database.dart';
 import '../../services/network.dart';
+import '../../services/widget_sync.dart';
 import '../../widgets/chip_cards.dart';
 import '../../widgets/layout_elements.dart';
 import '../../widgets/universal_ui_components.dart';
@@ -88,6 +89,9 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _devicesRaw = devices;
       });
+      // A widget added while the app was closed has never seen the list;
+      // saves keep it fresh from here on.
+      unawaited(syncDevicesToWidget(devices));
     } on PlatformException catch (e) {
       debugPrint('Failed to load devices: $e');
     } finally {

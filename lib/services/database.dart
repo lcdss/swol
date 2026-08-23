@@ -5,7 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 import 'data.dart';
-import 'widget_service.dart';
+import 'widget_sync.dart';
 
 /// Decodes the persisted device list.
 ///
@@ -44,13 +44,7 @@ class DeviceStorage {
     try {
       final filePath = await getFilePath();
       final file = File(filePath);
-      final devices = parseStorageDevices(await file.readAsString());
-
-      // Keeps a freshly added home screen widget from showing an empty list
-      // until the next edit.
-      await syncDevicesToWidget(devices);
-
-      return devices;
+      return parseStorageDevices(await file.readAsString());
     } on FileSystemException {
       return [];
     } on FormatException {
