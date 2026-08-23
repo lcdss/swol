@@ -9,6 +9,7 @@ StorageDevice buildStorageDevice({
   String macAddress = 'AA:BB:CC:DD:EE:FF',
   int? wolPort = 9,
   String? deviceType = 'server',
+  String? secureOnPassword,
   bool? isOnline,
 }) => StorageDevice(
   id: id,
@@ -17,6 +18,7 @@ StorageDevice buildStorageDevice({
   macAddress: macAddress,
   wolPort: wolPort,
   deviceType: deviceType,
+  secureOnPassword: secureOnPassword,
   isOnline: isOnline,
   modified: DateTime.utc(2026, 1, 2, 3, 4, 5),
 );
@@ -24,7 +26,7 @@ StorageDevice buildStorageDevice({
 void main() {
   group('StorageDevice JSON', () {
     test('round-trips through the documented export schema', () {
-      final device = buildStorageDevice();
+      final device = buildStorageDevice(secureOnPassword: '12:AB:34:CD:56:EF');
       final restored = StorageDevice.fromJson(device.toJson());
 
       expect(restored.id, device.id);
@@ -33,6 +35,7 @@ void main() {
       expect(restored.macAddress, device.macAddress);
       expect(restored.wolPort, device.wolPort);
       expect(restored.deviceType, device.deviceType);
+      expect(restored.secureOnPassword, device.secureOnPassword);
       expect(restored.modified, device.modified);
     });
 
@@ -46,6 +49,7 @@ void main() {
         'macAddress',
         'wolPort',
         'deviceType',
+        'secureOnPassword',
         'modified',
       });
     });
@@ -57,6 +61,12 @@ void main() {
 
       expect(restored.wolPort, isNull);
       expect(restored.deviceType, isNull);
+    });
+
+    test('imports a devices.json that predates secureOnPassword', () {
+      final json = buildStorageDevice().toJson()..remove('secureOnPassword');
+
+      expect(StorageDevice.fromJson(json).secureOnPassword, isNull);
     });
   });
 
@@ -84,11 +94,13 @@ void main() {
 
   group('conversions', () {
     test('toNetworkDevice keeps the addressable fields', () {
-      final network = buildStorageDevice().toNetworkDevice();
+      final network = buildStorageDevice(secureOnPassword: '12:AB:34:CD:56:EF')
+          .toNetworkDevice();
 
       expect(network.ipAddress, '192.168.1.10');
       expect(network.macAddress, 'AA:BB:CC:DD:EE:FF');
       expect(network.wolPort, 9);
+      expect(network.secureOnPassword, '12:AB:34:CD:56:EF');
     });
 
     test('toStorageDevice stamps the id and timestamp it is given', () {
@@ -109,6 +121,7 @@ void main() {
       expect(const WolInvalid().type, MsgType.error);
       expect(const WolInvalidIp('x').type, MsgType.error);
       expect(const WolInvalidMac('x').type, MsgType.error);
+      expect(const WolInvalidSecureOn('x').type, MsgType.error);
       expect(const WolInvalidPort('').type, MsgType.error);
       expect(const WolHostUnresolved('x').type, MsgType.error);
       expect(const WolSendFailed('x').type, MsgType.error);

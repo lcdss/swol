@@ -7,11 +7,13 @@ NetworkDevice device({
   String ipAddress = '192.168.1.10',
   String macAddress = 'AA:BB:CC:DD:EE:FF',
   int? wolPort = 9,
+  String? secureOnPassword,
 }) => NetworkDevice(
   hostName: 'nas',
   ipAddress: ipAddress,
   macAddress: macAddress,
   wolPort: wolPort,
+  secureOnPassword: secureOnPassword,
 );
 
 void main() {
@@ -98,6 +100,29 @@ void main() {
 
       expect(messages.whereType<WolInvalidMac>(), isEmpty);
     });
+
+    test('reports an unusable SecureOn password and stops', () async {
+      final messages = await sendWolPackage(
+        device: device(secureOnPassword: 'not-a-password'),
+      ).toList();
+
+      expect(
+        messages.whereType<WolInvalidSecureOn>().single.password,
+        'not-a-password',
+      );
+      expect(messages.last, isA<WolInvalid>());
+    });
+
+    test('accepts a SecureOn password stored with hyphens', () async {
+      final messages = await sendWolPackage(
+        device: device(
+          ipAddress: '256.1.1.1',
+          secureOnPassword: '12-AB-34-CD-56-EF',
+        ),
+      ).toList();
+
+      expect(messages.whereType<WolInvalidSecureOn>(), isEmpty);
+    });
   });
 
   group('sendWolPackage happy path', () {
@@ -138,6 +163,20 @@ void main() {
         1,
         reason: 'exactly one send outcome',
       );
+      expect(messages.last, isA<PingSucceeded>());
+    }, timeout: const Timeout(Duration(minutes: 1)));
+
+    test('sends the packet with a SecureOn password', () async {
+      final messages = await sendWolPackage(
+        device: device(
+          ipAddress: '127.0.0.1',
+          secureOnPassword: '12:AB:34:CD:56:EF',
+        ),
+        wifi: () async => (ip: '10.0.0.5', submask: '255.0.0.0'),
+      ).toList();
+
+      expect(messages.whereType<WolInvalidSecureOn>(), isEmpty);
+      expect(messages.whereType<WolSent>(), hasLength(1));
       expect(messages.last, isA<PingSucceeded>());
     }, timeout: const Timeout(Duration(minutes: 1)));
   });

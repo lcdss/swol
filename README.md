@@ -50,6 +50,7 @@ UI. An example of the file structure is shown below:
     "macAddress": "12:12:12:12:12:12",
     "wolPort": 9,
     "deviceType": "server",
+    "secureOnPassword": "12:AB:34:CD:56:EF",
     "modified": "2023-04-14T14:17:45.974511"
   },
   {
@@ -65,7 +66,9 @@ UI. An example of the file structure is shown below:
 ```
 
 `deviceType` must be one of `server`, `desktop`, `laptop`, `printer`, `network`, `iot`, `tv`,
-`mobile` or `other`. Anything else imports fine but shows no icon.
+`mobile` or `other`. Anything else imports fine but shows no icon. `secureOnPassword` is
+optional: when present (six hex pairs, like a MAC) it is appended to the magic packet for
+hardware that supports SecureOn.
 
 ## Download
 

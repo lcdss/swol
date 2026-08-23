@@ -57,6 +57,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   // Rich Text Controllers needed, so delimiter symbols are colored differently
   late final RichTextController _controllerIp;
   late final RichTextController _controllerMac;
+  late final RichTextController _controllerSecureOn;
 
   // One Form for the whole sheet: fields (the icon selector included) manage
   // their own error display through it instead of ad-hoc state.
@@ -81,6 +82,9 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
     final deviceType = _controllerIcon.text.isEmpty
         ? null
         : _controllerIcon.text;
+    final secureOnPassword = _controllerSecureOn.text.isEmpty
+        ? null
+        : _controllerSecureOn.text.replaceAll('-', ':');
 
     return switch (widget.device) {
       StorageDevice(:final id, :final isOnline) => StorageDevice(
@@ -88,6 +92,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
         hostName: _controllerName.text,
         ipAddress: _controllerIp.text,
         macAddress: _controllerMac.text.replaceAll('-', ':'),
+        secureOnPassword: secureOnPassword,
         modified: DateTime.now(),
         wolPort: wolPort,
         isOnline: isOnline,
@@ -97,6 +102,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
         hostName: _controllerName.text,
         ipAddress: _controllerIp.text,
         macAddress: _controllerMac.text.replaceAll('-', ':'),
+        secureOnPassword: secureOnPassword,
         wolPort: wolPort,
         deviceType: deviceType,
       ),
@@ -129,10 +135,22 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
       ],
     );
 
+    _controllerSecureOn = RichTextController(
+      onMatch: (List<String> match) {},
+      targetMatches: [
+        MatchTargetItem(
+          regex: AppConstants.macPattern,
+          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+          allowInlineMatching: true,
+        ),
+      ],
+    );
+
     // initialize the text controllers
     _controllerName.text = widget.device.hostName;
     _controllerIp.text = widget.device.ipAddress;
     _controllerMac.text = widget.device.macAddress;
+    _controllerSecureOn.text = widget.device.secureOnPassword ?? '';
 
     // Labels need a BuildContext to localize, so match on value only here.
     final wolPorts = AppConstants.getChipsWolPorts();
@@ -166,6 +184,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
     _controllerIcon.dispose();
     _controllerIp.dispose();
     _controllerMac.dispose();
+    _controllerSecureOn.dispose();
     super.dispose();
   }
 
@@ -231,6 +250,15 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
                 ),
                 inputFormatters: [MACAddressFormatter()],
               ),
+              getCustomTextFormField(
+                label: AppLocalizations.of(context)!.formSecureOnHint,
+                controller: _controllerSecureOn,
+                validator: createOptionalValidator(
+                  AppConstants.secureOnValidationRegex,
+                  AppLocalizations.of(context)!.formSecureOnError,
+                ),
+                inputFormatters: [MACAddressFormatter()],
+              ),
               const SizedBox(height: 20),
               buildPortSelector(textTheme),
               buildIconSelector(textTheme),
@@ -290,6 +318,9 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
         l10n.formErrorMessageIp,
       if (!matches(AppConstants.macValidationRegex, _controllerMac))
         l10n.formErrorMessageMac,
+      if (_controllerSecureOn.text.isNotEmpty &&
+          !matches(AppConstants.secureOnValidationRegex, _controllerSecureOn))
+        l10n.formErrorMessageSecureOn,
       if (!matches(AppConstants.portValidationRegex, _controllerPort))
         l10n.formErrorMessagePort,
       if (indexIconSelector == null) l10n.formErrorMessageType,
@@ -655,3 +686,10 @@ class EditDeviceFormPage extends ModularBottomFormPage {
 /// [regEx] is the RegEx to be evaluated, [msg] ist the error message being shown, if the input doesn't satisfy the RegEx
 String? Function(String?) createValidator(String regEx, String msg) =>
     (String? value) => !RegExp(regEx).hasMatch(value ?? '') ? msg : null;
+
+/// Like [createValidator], but an empty input is valid -- for optional fields.
+String? Function(String?) createOptionalValidator(String regEx, String msg) =>
+    (String? value) =>
+        value == null || value.isEmpty || RegExp(regEx).hasMatch(value)
+        ? null
+        : msg;

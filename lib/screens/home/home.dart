@@ -511,6 +511,7 @@ String messageText(AppLocalizations l10n, Message message) => switch (message) {
   WolHostUnresolved(:final host) => l10n.homeWolCardHost(host),
   WolInvalidIp(:final ip) => l10n.homeWolCardIp(ip),
   WolInvalidMac(:final mac) => l10n.homeWolCardMac(mac),
+  WolInvalidSecureOn(:final password) => l10n.homeWolCardSecureOn(password),
   WolInvalidPort(:final port) => l10n.homeWolCardPort(port),
   WolInvalid() => l10n.homeWolCardInvalid,
   WolValid() => l10n.homeWolCardValid,

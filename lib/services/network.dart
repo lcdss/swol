@@ -101,6 +101,7 @@ Stream<Message> sendWolPackage({
   String ip = device.ipAddress;
   // Stored MACs may use hyphens; MACAddress only accepts colons.
   final mac = device.macAddress.replaceAll('-', ':');
+  final secureOn = device.secureOnPassword?.replaceAll('-', ':');
   final int? port = device.wolPort;
   bool invalid = false;
 
@@ -126,6 +127,11 @@ Stream<Message> sendWolPackage({
     invalid = true;
   }
 
+  if (secureOn != null && !SecureONPassword.validate(secureOn).state) {
+    yield WolInvalidSecureOn(device.secureOnPassword!);
+    invalid = true;
+  }
+
   if (port == null || port < 0 || port > 65535) {
     yield WolInvalidPort(port?.toString() ?? '');
     invalid = true;
@@ -142,6 +148,7 @@ Stream<Message> sendWolPackage({
 
   final ipv4Address = IPAddress(ip);
   final macAddress = MACAddress(mac);
+  final password = secureOn == null ? null : SecureONPassword(secureOn);
 
   // The port range was validated above, so it is non-null from here on.
   final validPort = port!;
@@ -170,13 +177,19 @@ Stream<Message> sendWolPackage({
   }
 
   try {
-    await WakeOnLAN(ipv4Address, macAddress, port: validPort).wake(repeat: 3);
+    await WakeOnLAN(
+      ipv4Address,
+      macAddress,
+      password: password,
+      port: validPort,
+    ).wake(repeat: 3);
 
     if (broadcast != null) {
       await Future.delayed(const Duration(seconds: 1));
       await WakeOnLAN(
         IPAddress(broadcast),
         macAddress,
+        password: password,
         port: validPort,
       ).wake(repeat: 3);
     }

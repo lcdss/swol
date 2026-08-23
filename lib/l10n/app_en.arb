@@ -49,6 +49,16 @@
       }
     }
   },
+  "homeWolCardSecureOn": "'{password}' is an invalid SecureOn password",
+  "@homeWolCardSecureOn": {
+    "placeholders": {
+      "password": {
+        "type": "String",
+        "example": "12:AB:00:00:00:00",
+        "description": "The SecureOn password which was provided by the user."
+      }
+    }
+  },
   "homeWolCardPort": "'{port}' is an invalid port",
   "@homeWolCardPort": {
     "placeholders": {
@@ -114,6 +124,8 @@
   "formIpError": "invalid IP Address",
   "formMacHint": "MAC Address",
   "formMacError": "invalid MAC Address",
+  "formSecureOnHint": "SecureOn Password (optional)",
+  "formSecureOnError": "invalid SecureOn password",
   "formPortLabel": "Wake On Lan Port",
   "formPortHint": "Port",
   "formPortError": "invalid",
@@ -132,6 +144,7 @@
   "formErrorMessageName": "device has no name",
   "formErrorMessageIp": "invalid IP Address",
   "formErrorMessageMac": "invalid MAC Address",
+  "formErrorMessageSecureOn": "invalid SecureOn password",
   "formErrorMessagePort": "invalid port",
   "formErrorMessageType": "no device type selected",
   "formDeleteAlertTitle": "Delete Device",

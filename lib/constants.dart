@@ -64,6 +64,9 @@ class AppConstants {
       r'^(?:[0-9A-Fa-f]{2}([-:]))(?:[0-9A-Fa-f]{2}\1){4}[0-9A-Fa-f]{2}$';
   static const macSubStringValidationRegex =
       r'^(?:[0-9A-Fa-f]{2}(?:([-:])|$)){0,5}[0-9A-Fa-f]{0,2}$';
+
+  /// SecureOn passwords share the MAC format: six hex pairs.
+  static const secureOnValidationRegex = macValidationRegex;
   static const portValidationRegex =
       r'^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$';
   static const formWrongFormatIcon = Icons.assignment_outlined;

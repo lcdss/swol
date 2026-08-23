@@ -7,12 +7,16 @@ sealed class Device implements Comparable<Device> {
   final int? wolPort;
   final String? deviceType;
 
+  /// Six hex pairs, like a MAC; appended to the magic packet when set.
+  final String? secureOnPassword;
+
   Device({
     required this.hostName,
     required this.ipAddress,
     required this.macAddress,
     this.wolPort,
     this.deviceType,
+    this.secureOnPassword,
   });
 
   Device copyWith({
@@ -23,6 +27,7 @@ sealed class Device implements Comparable<Device> {
     int? wolPort,
     DateTime? modified,
     String? deviceType,
+    String? secureOnPassword,
   });
 
   Map<String, dynamic> toJson();
@@ -39,6 +44,7 @@ class StorageDevice extends Device {
     required super.macAddress,
     super.wolPort,
     super.deviceType,
+    super.secureOnPassword,
     required this.id,
     required this.modified,
     this.isOnline,
@@ -58,6 +64,7 @@ class StorageDevice extends Device {
     int? wolPort,
     DateTime? modified,
     String? deviceType,
+    String? secureOnPassword,
     bool? isOnline,
   }) {
     return StorageDevice(
@@ -68,6 +75,7 @@ class StorageDevice extends Device {
       wolPort: wolPort ?? this.wolPort,
       modified: modified ?? this.modified,
       deviceType: deviceType ?? this.deviceType,
+      secureOnPassword: secureOnPassword ?? this.secureOnPassword,
       isOnline: isOnline ?? this.isOnline,
     );
   }
@@ -81,6 +89,7 @@ class StorageDevice extends Device {
       "macAddress": macAddress,
       "wolPort": wolPort,
       "deviceType": deviceType,
+      "secureOnPassword": secureOnPassword,
       "modified": modified.toIso8601String(),
     };
   }
@@ -94,6 +103,7 @@ class StorageDevice extends Device {
       wolPort: json['wolPort'],
       modified: DateTime.parse(json['modified']),
       deviceType: json['deviceType'],
+      secureOnPassword: json['secureOnPassword'],
     );
   }
 
@@ -104,6 +114,7 @@ class StorageDevice extends Device {
       macAddress: macAddress,
       wolPort: wolPort,
       deviceType: deviceType,
+      secureOnPassword: secureOnPassword,
     );
   }
 }
@@ -115,6 +126,7 @@ class NetworkDevice extends Device {
     super.macAddress = '',
     super.wolPort,
     super.deviceType,
+    super.secureOnPassword,
   });
 
   @override
@@ -132,6 +144,7 @@ class NetworkDevice extends Device {
     int? wolPort,
     DateTime? modified,
     String? deviceType,
+    String? secureOnPassword,
   }) {
     return NetworkDevice(
       hostName: hostName ?? this.hostName,
@@ -139,6 +152,7 @@ class NetworkDevice extends Device {
       macAddress: macAddress ?? this.macAddress,
       wolPort: wolPort ?? this.wolPort,
       deviceType: deviceType ?? this.deviceType,
+      secureOnPassword: secureOnPassword ?? this.secureOnPassword,
     );
   }
 
@@ -150,6 +164,7 @@ class NetworkDevice extends Device {
       'hostName': hostName,
       "wolPort": wolPort,
       "deviceType": deviceType,
+      "secureOnPassword": secureOnPassword,
     };
   }
 
@@ -161,6 +176,7 @@ class NetworkDevice extends Device {
     int? wolPort,
     required DateTime modified,
     String? deviceType,
+    String? secureOnPassword,
   }) {
     return StorageDevice(
       id: id,
@@ -170,6 +186,7 @@ class NetworkDevice extends Device {
       wolPort: wolPort ?? this.wolPort,
       modified: modified,
       deviceType: deviceType ?? this.deviceType,
+      secureOnPassword: secureOnPassword ?? this.secureOnPassword,
     );
   }
 }
@@ -210,6 +227,15 @@ final class WolInvalidMac extends Message {
   const WolInvalidMac(this.mac);
 
   final String mac;
+
+  @override
+  MsgType get type => MsgType.error;
+}
+
+final class WolInvalidSecureOn extends Message {
+  const WolInvalidSecureOn(this.password);
+
+  final String password;
 
   @override
   MsgType get type => MsgType.error;
