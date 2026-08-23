@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.3.1] - 26-08-23
+
+Bug-fix pass over the whole app after a full review.
+
+### Fixed
+
+- hostnames with digits or hyphens (`web1.local`, `my-nas.lan`) are now
+  accepted in the IP address field; letters-only names were the only ones
+  allowed before
+- the add/edit device form no longer opens with every field already marked
+  invalid before any interaction
+- network discovery could crash and lose a device when a slow ping answered
+  after the scan had closed its stream; the progress bar also stopped at 99%
+- importing a devices file raced a delete against the write and could lose the
+  imported list; the import is now a plain awaited overwrite
+- exporting with no devices saved shared a 0-byte file that could not be
+  imported back; it now exports a valid empty list
+- waking a device whose hostname resolves only to IPv6 left the wake dialog on
+  an endless spinner; stream errors now render a message
+- an unresolvable hostname produced two error messages for the same problem
+- rotating the phone or switching theme while the wake dialog was open resent
+  the magic packets and restarted the ping loop
+- "save with errors" with a non-numeric port silently saved nothing; the port
+  field now accepts only digits and survives junk
+- devices hidden by the type filter kept a stale online status until
+  re-filtered
+- re-running the release workflow for an already-released version minted
+  duplicate `-build-N` releases; it now skips the release step
+- an incomplete `key.properties` now fails the build naming the missing keys
+
 ## [1.3.0] - 26-08-22
 
 Full toolchain and dependency upgrade after roughly 20 months without a
