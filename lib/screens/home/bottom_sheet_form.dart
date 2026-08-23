@@ -87,7 +87,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
         id: id,
         hostName: _controllerName.text,
         ipAddress: _controllerIp.text,
-        macAddress: _controllerMac.text,
+        macAddress: _controllerMac.text.replaceAll('-', ':'),
         modified: DateTime.now(),
         wolPort: wolPort,
         isOnline: isOnline,
@@ -96,7 +96,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
       NetworkDevice() => NetworkDevice(
         hostName: _controllerName.text,
         ipAddress: _controllerIp.text,
-        macAddress: _controllerMac.text,
+        macAddress: _controllerMac.text.replaceAll('-', ':'),
         wolPort: wolPort,
         deviceType: deviceType,
       ),
@@ -360,11 +360,13 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
     String? Function(String?)? validator,
     void Function(String)? onChanged,
     List<TextInputFormatter>? inputFormatters,
+    TextInputType? keyboardType,
   }) {
     return Padding(
       padding: const EdgeInsets.only(top: 20.0),
       child: TextFormField(
         inputFormatters: inputFormatters,
+        keyboardType: keyboardType,
         // Not `always`: that painted every field red the moment the form
         // opened, before the user had touched anything.
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -441,6 +443,7 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
           child: getCustomTextFormField(
             label: AppLocalizations.of(context)!.formPortHint,
             controller: _controllerPort,
+            keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: createValidator(
               AppConstants.portValidationRegex,

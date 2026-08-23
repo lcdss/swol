@@ -115,6 +115,34 @@ class MACAddressFormatter extends CustomSeparatorFormatter {
         preferredSeparator: ':',
         allowedInput: RegExp(AppConstants.macSubStringValidationRegex),
       );
+
+  static final _bareMac = RegExp(r'^[0-9A-Fa-f]{12}$');
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // A pasted MAC arrives in whatever notation the source used -- hyphens,
+    // Cisco dots, or no separators at all. Reformat it instead of bouncing
+    // the user to a text editor first.
+    if (newValue.text.length > oldValue.text.length + 1) {
+      final hex = newValue.text.replaceAll(RegExp(r'[:\-.\s]'), '');
+
+      if (_bareMac.hasMatch(hex)) {
+        final formatted = [
+          for (var i = 0; i < 12; i += 2) hex.substring(i, i + 2),
+        ].join(':');
+
+        return TextEditingValue(
+          text: formatted,
+          selection: TextSelection.collapsed(offset: formatted.length),
+        );
+      }
+    }
+
+    return super.formatEditUpdate(oldValue, newValue);
+  }
 }
 
 class IPAddressFormatter extends CustomSeparatorFormatter {

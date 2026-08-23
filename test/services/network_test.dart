@@ -88,6 +88,16 @@ void main() {
       expect(messages.whereType<WolSent>(), isEmpty);
       expect(messages.whereType<PingAttempt>(), isEmpty);
     });
+
+    test('accepts a MAC stored with hyphens', () async {
+      // Regression: the form accepted AA-BB-..., but the send path validated
+      // colons only, so the saved device could never actually be woken.
+      final messages = await sendWolPackage(
+        device: device(ipAddress: '256.1.1.1', macAddress: 'AA-BB-CC-DD-EE-FF'),
+      ).toList();
+
+      expect(messages.whereType<WolInvalidMac>(), isEmpty);
+    });
   });
 
   group('sendWolPackage happy path', () {

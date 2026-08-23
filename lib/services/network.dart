@@ -99,7 +99,8 @@ Stream<Message> sendWolPackage({
 }) async* {
   // Validate correct formatting of ip and mac addresses
   String ip = device.ipAddress;
-  final mac = device.macAddress;
+  // Stored MACs may use hyphens; MACAddress only accepts colons.
+  final mac = device.macAddress.replaceAll('-', ':');
   final int? port = device.wolPort;
   bool invalid = false;
 
@@ -120,7 +121,8 @@ Stream<Message> sendWolPackage({
   }
 
   if (!MACAddress.validate(mac).state) {
-    yield WolInvalidMac(mac);
+    // The stored text, not the normalized one -- it is what the user typed.
+    yield WolInvalidMac(device.macAddress);
     invalid = true;
   }
 

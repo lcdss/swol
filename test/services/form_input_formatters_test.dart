@@ -98,6 +98,28 @@ void main() {
         'AA:BB:CC:DD:EE:FF',
       );
     });
+
+    test('normalizes a pasted MAC in any common notation', () {
+      final formatter = MACAddressFormatter();
+
+      String paste(String text) =>
+          formatter.formatEditUpdate(TextEditingValue.empty, value(text)).text;
+
+      expect(paste('AA-BB-CC-DD-EE-FF'), 'AA:BB:CC:DD:EE:FF');
+      expect(paste('AABBCCDDEEFF'), 'AA:BB:CC:DD:EE:FF');
+      expect(paste('aabb.ccdd.eeff'), 'aa:bb:cc:dd:ee:ff');
+    });
+
+    test('leaves a paste that is not a full MAC alone', () {
+      final formatter = MACAddressFormatter();
+
+      expect(
+        formatter
+            .formatEditUpdate(TextEditingValue.empty, value('AA:BB:CC'))
+            .text,
+        'AA:BB:CC',
+      );
+    });
   });
 
   group('IPAddressFormatter', () {
