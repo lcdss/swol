@@ -1,0 +1,30 @@
+lib/services/utilities.dart
+  s_7efe093dbda125::t_d01cc2e085c37c 17,19-26
+lib/services/network.dart
+  s_7efe093dbda125::t_3feabfcb913f64 92-94
+lib/l10n/app_en.arb
+  s_7efe093dbda125::t_f6cfe51c554ab8 97
+test/services/network_test.dart
+  s_7efe093dbda125::t_6ebfe01a0f4ff1 93-114
+  s_7efe093dbda125::t_349d7cd8ac9d9f 76-78
+  s_7efe093dbda125::t_cb3315de7b7ec3 189,191-194
+  s_7efe093dbda125::t_675723edf5c6ee 183-184,187-188
+lib/screens/home/home.dart
+  s_7efe093dbda125::t_31e2fa142ba12d 425-429,434,437-439,442,447,451-455,459-482,484-494
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "5daadda2c10d00b3dad8d22aa69e28463c8deb51",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
