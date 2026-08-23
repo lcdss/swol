@@ -4,9 +4,12 @@
          getWifiIP, are merged in from that plugin's own manifest. -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- allowBackup is deliberate: the device list is worth restoring on a
+         new phone and contains nothing beyond LAN hostnames and MACs. -->
     <application
         android:label="swol"
         android:name="${applicationName}"
+        android:allowBackup="true"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/launcher_icon">
         <activity

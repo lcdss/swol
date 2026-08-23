@@ -81,23 +81,23 @@ jobs:
           version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
           echo "VERSION=$version" >> $GITHUB_ENV
 
-      - name: Check if Tag Exists
+      # checkout fetches no tags, so without the explicit fetch this check
+      # always came up empty and re-runs minted duplicate releases with
+      # -build-N tags. Now a re-run for an already-released version skips the
+      # release instead.
+      - name: Check if the release tag already exists
         id: check_tag
         run: |
+          git fetch --tags --quiet
           if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
-            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "v${{ env.VERSION }} already released; bump the version in pubspec.yaml to release again."
           else
-            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Modify Tag
-        if: env.TAG_EXISTS == 'true'
-        id: modify_tag
-        run: |
-          new_version="${{ env.VERSION }}-build-${{ github.run_number }}"
-          echo "VERSION=$new_version" >> $GITHUB_ENV
-
       - name: Create Release
+        if: steps.check_tag.outputs.exists == 'false'
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk,build/app/outputs/flutter-apk/app-arm64-v8a-release.apk,build/app/outputs/flutter-apk/app-x86_64-release.apk,build/app/outputs/bundle/release/app-release.aab"

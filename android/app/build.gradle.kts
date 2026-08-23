@@ -10,10 +10,16 @@ plugins {
 // clone, in which case the release build falls back to the debug keys below.
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
-if (keystorePropertiesFile.exists()) {
+val hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
     keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+
+    // Fail here, with names, rather than deep inside the signing task with a
+    // cryptic null when one of them was forgotten.
+    val missing = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
+        .filter { keystoreProperties.getProperty(it).isNullOrBlank() }
+    check(missing.isEmpty()) { "key.properties is missing: ${missing.joinToString()}" }
 }
-val hasReleaseKeystore = keystoreProperties.getProperty("storeFile") != null
 
 android {
     namespace = "dev.lcss.swol"
