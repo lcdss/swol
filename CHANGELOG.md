@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.4.0] - 26-08-23
+
+### Added
+
+- optional SecureOn password per device, appended to the magic packet for
+  hardware that requires it; exports carry it as an optional
+  `secureOnPassword` key and older device files import unchanged
+- home screen widget listing the saved devices; tapping one sends the wake
+  packets without opening the app, with a "Waking..." status line while they
+  go out
+- the app follows the system's Material You colors on Android 12+; a System
+  Colors switch under Settings > Appearance goes back to the app's own palette
+
+### Changed
+
+- wake and discovery use the phone's real subnet instead of assuming /24: the
+  extra broadcast goes to the actual subnet broadcast address, discovery
+  sweeps the whole subnet (clamped to /22), and a target outside the subnet
+  (wake over WAN) gets unicast only
+- a MAC address pasted in any common notation -- hyphens, Cisco dots, bare
+  hex -- is reformatted instead of rejected, and devices saved with hyphens
+  now actually wake
+- the port field opens a numeric keyboard
+- opening the discover page no longer stutters the transition; the scan
+  starts after the animation settles
+
+### Fixed
+
+- a discovery probe error no longer leaves the scan hanging with the
+  progress bar stuck
+- malformed Wi-Fi info from the platform no longer crashes discovery or wake
+- the wake dialog wording: packets are "sent", not "send Packages"
+
 ## [1.3.2] - 26-08-23
 
 ### Fixed
