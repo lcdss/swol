@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.3.0] - 26-08-22
 
 Full toolchain and dependency upgrade after roughly 20 months without a
 release. No intentional changes to how the app is used.
