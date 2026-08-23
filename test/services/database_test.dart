@@ -174,6 +174,16 @@ void main() {
       expect(devices.firstWhere((d) => d.id == 'other').hostName, 'untouched');
     });
 
+    test('updateDevice returns the device exactly as stored', () async {
+      final original = device();
+      final (devices, returned) = await storage.updateDevice(original, [
+        original,
+      ]);
+
+      // Same instance, so the caller never sees a stale `modified`.
+      expect(identical(returned, devices.single), isTrue);
+    });
+
     test('updateDevice restamps modified', () async {
       final original = device(id: 'keep');
       final (devices, _) = await storage.updateDevice(original, [original]);

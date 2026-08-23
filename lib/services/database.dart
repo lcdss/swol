@@ -84,14 +84,14 @@ class DeviceStorage {
     StorageDevice updatedDevice,
     List<StorageDevice> devices,
   ) async {
-    final updatedDevices = devices.map((device) {
-      if (device.id == updatedDevice.id) {
-        return updatedDevice.copyWith(modified: DateTime.now());
-      }
-      return device;
-    }).toList();
+    // Restamped once, so the returned device is the same one that was stored
+    // -- not a twin with the old timestamp.
+    final saved = updatedDevice.copyWith(modified: DateTime.now());
+    final updatedDevices = devices
+        .map((device) => device.id == saved.id ? saved : device)
+        .toList();
     await saveDevices(updatedDevices);
-    return (updatedDevices, updatedDevice);
+    return (updatedDevices, saved);
   }
 
   /// Deletes a device from the list of devices

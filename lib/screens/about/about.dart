@@ -27,8 +27,14 @@ class _AboutPageState extends State<AboutPage> {
   final Uri _url = Uri.parse(AppConstants.sourceCodeLink);
 
   Future<void> _launchUrl(Uri url) async {
-    if (!await launchUrl(url)) {
-      log('Could not launch $url');
+    // launchUrl throws (instead of returning false) when no app can handle
+    // the URL on some platforms.
+    try {
+      if (!await launchUrl(url)) {
+        log('Could not launch $url');
+      }
+    } on PlatformException catch (error) {
+      log('Could not launch $url: ${error.message}');
     }
   }
 

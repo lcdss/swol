@@ -145,9 +145,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// updates the status of all devices in [_devices]
+  /// updates the status of all devices, including ones the type filter is
+  /// currently hiding -- otherwise those reappear with a stale status
   Future<void> checkAllDevicesStatus() async {
-    for (StorageDevice device in _devices) {
+    for (StorageDevice device in _devicesRaw) {
       checkDeviceStatus(device);
     }
   }
@@ -239,7 +240,7 @@ class _HomePageState extends State<HomePage> {
       onRefresh: () async {
         _pingDevicesTimer?.cancel();
         // set online state for all devices to null because online state is not known yet
-        for (StorageDevice device in _devices) {
+        for (StorageDevice device in _devicesRaw) {
           device.isOnline = null;
         }
         _pingDevices();
