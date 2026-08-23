@@ -96,6 +96,9 @@ void main() {
       // both run for real without depending on the LAN.
       final messages = await sendWolPackage(
         device: device(ipAddress: '127.0.0.1'),
+        // Off-subnet from the fake Wi-Fi, so only the unicast packet is sent
+        // and nothing leaves the machine.
+        wifi: () async => (ip: '10.0.0.5', submask: '255.0.0.0'),
       ).toList();
 
       expect(messages.first, isA<WolValid>());
@@ -108,6 +111,23 @@ void main() {
       );
       expect(messages.whereType<PingStarted>(), hasLength(1));
       expect(messages.whereType<PingAttempt>(), isNotEmpty);
+      expect(messages.last, isA<PingSucceeded>());
+    }, timeout: const Timeout(Duration(minutes: 1)));
+
+    test('sends the broadcast when the target shares the subnet', () async {
+      // Loopback's own "subnet": the broadcast resolves to 127.255.255.255,
+      // which never leaves the machine either.
+      final messages = await sendWolPackage(
+        device: device(ipAddress: '127.0.0.1'),
+        wifi: () async => (ip: '127.0.0.2', submask: '255.0.0.0'),
+      ).toList();
+
+      expect(
+        messages.whereType<WolSent>().length +
+            messages.whereType<WolSendFailed>().length,
+        1,
+        reason: 'exactly one send outcome',
+      );
       expect(messages.last, isA<PingSucceeded>());
     }, timeout: const Timeout(Duration(minutes: 1)));
   });
@@ -132,7 +152,8 @@ void main() {
     test('probes all 254 addresses and finishes at 100%', () async {
       final progress = <double>[];
       final devices = await findDevicesInNetwork(
-        '192.168.1',
+        '192.168.1.5',
+        '255.255.255.0',
         progress.add,
         probe: fakeProbe(alive: {1, 42, 254}),
       ).toList();
@@ -151,7 +172,8 @@ void main() {
       // .254 finished, so a slower sibling chain would add() to a closed
       // controller (StateError) and its device was lost.
       final devices = await findDevicesInNetwork(
-        '192.168.1',
+        '192.168.1.5',
+        '255.255.255.0',
         (_) {},
         probe: fakeProbe(
           alive: {253},
@@ -164,12 +186,58 @@ void main() {
 
     test('reports an empty subnet with no devices and no error', () async {
       final devices = await findDevicesInNetwork(
-        '192.168.1',
+        '192.168.1.5',
+        '255.255.255.0',
         (_) {},
         probe: fakeProbe(),
       ).toList();
 
       expect(devices, isEmpty);
+    });
+
+    test('sweeps the whole subnet when it is wider than /24', () async {
+      // Regression: the sweep assumed /24, so on this /23 the upper half of
+      // the network was never probed at all.
+      final probedIps = <String>[];
+      final devices = await findDevicesInNetwork(
+        '192.168.150.18',
+        '255.255.254.0',
+        (_) {},
+        probe: (ip) async {
+          probedIps.add(ip);
+
+          return const {'192.168.150.3', '192.168.151.200'}.contains(ip)
+              ? NetworkDevice(ipAddress: ip)
+              : null;
+        },
+      ).toList();
+
+      expect(probedIps, hasLength(510));
+      expect(probedIps, contains('192.168.150.1'));
+      expect(probedIps, contains('192.168.151.254'));
+      expect(probedIps, isNot(contains('192.168.150.0')));
+      expect(probedIps, isNot(contains('192.168.151.255')));
+      expect(devices.map((d) => d.ipAddress), {
+        '192.168.150.3',
+        '192.168.151.200',
+      });
+    });
+
+    test('clamps very wide subnets to the /22 around the local IP', () async {
+      var probed = 0;
+
+      await findDevicesInNetwork(
+        '10.1.37.9',
+        '255.255.0.0',
+        (_) {},
+        probe: (_) async {
+          probed++;
+
+          return null;
+        },
+      ).toList();
+
+      expect(probed, 1022);
     });
   });
 

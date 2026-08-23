@@ -9,6 +9,7 @@ import 'package:swol/constants.dart';
 
 import '../../services/data.dart';
 import '../../services/network.dart';
+import '../../services/utilities.dart';
 import '../../widgets/layout_elements.dart';
 import '../../widgets/universal_ui_components.dart';
 import 'bottom_sheet_form.dart';
@@ -58,17 +59,22 @@ class _DiscoverPageState extends State<DiscoverPage> {
 
   String? _subnet;
 
-  /// The /24 the device is on, or null when there is no usable Wi-Fi address.
+  /// The Wi-Fi address and submask, or null when there is no usable Wi-Fi
+  /// address.
   ///
   /// `getWifiIP` returns null when Wi-Fi is off or the platform withholds the
-  /// address, so this has to be allowed to fail rather than be waited on.
-  Future<String?> _resolveSubnet() async {
+  /// address, so this has to be allowed to fail rather than be waited on. A
+  /// missing or malformed submask falls back to the /24 the scan always
+  /// assumed before.
+  Future<({String ip, String submask})?> _resolveNetwork() async {
     final ip = await NetworkInfo().getWifiIP();
-    final lastDot = ip?.lastIndexOf('.') ?? -1;
 
-    if (ip == null || lastDot < 0) return null;
+    if (ip == null || !ip.contains('.')) return null;
 
-    return ip.substring(0, lastDot);
+    final submask = await NetworkInfo().getWifiSubmask();
+    final usable = submask != null && maskToPrefix(submask) != null;
+
+    return (ip: ip, submask: usable ? submask : '255.255.255.0');
   }
 
   // variables for discovering network devices and showing the progress in the ui
@@ -83,19 +89,23 @@ class _DiscoverPageState extends State<DiscoverPage> {
       _progress = 0.0;
     });
 
-    final subnet = await _resolveSubnet();
+    final network = await _resolveNetwork();
 
     if (!mounted) return;
 
     setState(() {
-      _subnet = subnet;
+      _subnet = network == null
+          ? null
+          : cidrNotation(network.ip, network.submask);
     });
 
-    // No subnet means nothing to scan; the card falls back to
+    // No network means nothing to scan; the card falls back to
     // discoverCardSubnetNoNetwork and a pull-to-refresh can retry.
-    if (subnet == null) return;
+    if (network == null) return;
 
-    final stream = findDevicesInNetwork(subnet, (progress) {
+    final stream = findDevicesInNetwork(network.ip, network.submask, (
+      progress,
+    ) {
       if (!mounted) {
         // Exit the loop if the widget is no longer mounted.
         return;

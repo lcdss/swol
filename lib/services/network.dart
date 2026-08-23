@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_ping/dart_ping.dart';
+import 'package:network_info_plus/network_info_plus.dart';
 import 'package:swol/services/utilities.dart';
 import 'package:wake_on_lan/wake_on_lan.dart';
 
@@ -33,47 +34,69 @@ Future<NetworkDevice?> probeDevice(String ipAddress) async {
   return null;
 }
 
-/// Sweeps `networkPrefix.1` through `.254` with [_chainCount] concurrent
-/// chains, reporting progress in [0, 1] after every probe.
+/// Reads the phone's Wi-Fi IPv4 address and submask; null when there is no
+/// usable Wi-Fi connection.
+typedef WifiNetwork = Future<({String? ip, String? submask})> Function();
+
+Future<({String? ip, String? submask})> wifiNetwork() async {
+  final info = NetworkInfo();
+
+  return (ip: await info.getWifiIP(), submask: await info.getWifiSubmask());
+}
+
+/// Sweeps every host address of the subnet [localIp] sits on with 25
+/// concurrent chains, reporting progress in [0, 1] after every probe.
+/// Subnets wider than /22 are clamped to the /22 block around [localIp] so
+/// the sweep stays bounded; devices outside it can still be added manually.
 Stream<NetworkDevice> findDevicesInNetwork(
-  String networkPrefix,
+  String localIp,
+  String submask,
   void Function(double) progressCallback, {
   DeviceProbe probe = probeDevice,
 }) {
   const chainCount = 25;
-  const lastIndex = 254;
+
+  final prefix = (maskToPrefix(submask) ?? 24).clamp(22, 30);
+  final network =
+      ipToNumeric(localIp) & ((0xFFFFFFFF << (32 - prefix)) & 0xFFFFFFFF);
+  final firstHost = network + 1;
+  final hostCount = (1 << (32 - prefix)) - 2;
 
   final controller = StreamController<NetworkDevice>();
   var probed = 0;
   var chainsLeft = chainCount;
 
-  Future<void> scanChain(int start) async {
-    for (var index = start; index <= lastIndex; index += chainCount) {
-      final device = await probe('$networkPrefix.$index');
+  Future<void> scanChain(int offset) async {
+    for (var index = offset; index < hostCount; index += chainCount) {
+      final device = await probe(numericToIp(firstHost + index));
 
       if (device != null) {
         controller.add(device);
       }
 
-      progressCallback(++probed / lastIndex);
+      progressCallback(++probed / hostCount);
     }
 
-    // Close only once every chain is done. Closing when .254 completes, as
-    // this used to, let a slower sibling chain add() to a closed controller.
+    // Close only once every chain is done. Closing when the last address
+    // completes, as this used to, let a slower sibling chain add() to a
+    // closed controller.
     if (--chainsLeft == 0) {
       await controller.close();
     }
   }
 
-  for (var start = 1; start <= chainCount; start++) {
-    unawaited(scanChain(start));
+  for (var offset = 0; offset < chainCount; offset++) {
+    unawaited(scanChain(offset));
   }
 
   return controller.stream;
 }
 
 /// sends the magic packet to the [device] that should receive a magic wol package in order to get woken up
-Stream<Message> sendWolPackage({required NetworkDevice device}) async* {
+Stream<Message> sendWolPackage({
+  required NetworkDevice device,
+  WifiNetwork wifi = wifiNetwork,
+}) async* {
   // Validate correct formatting of ip and mac addresses
   String ip = device.ipAddress;
   final mac = device.macAddress;
@@ -118,17 +141,44 @@ Stream<Message> sendWolPackage({required NetworkDevice device}) async* {
   final ipv4Address = IPAddress(ip);
   final macAddress = MACAddress(mac);
 
-  // sometimes only a broadcast works to wake a device so a broadcast is sent additionally
-  final subnet = ip.substring(0, ip.lastIndexOf("."));
-  final ipv4Broadcast = IPAddress("$subnet.255");
-
   // The port range was validated above, so it is non-null from here on.
   final validPort = port!;
 
+  // Sometimes only a broadcast works to wake a device, so one is sent
+  // additionally -- to the real subnet broadcast, since assuming /24 sent it
+  // nowhere on wider networks. An off-subnet target (wake over WAN through a
+  // port forward) gets unicast only; a subnet broadcast cannot reach it.
+  ({String? ip, String? submask}) local;
+
+  try {
+    local = await wifi();
+  } catch (_) {
+    local = (ip: null, submask: null);
+  }
+
+  final localIp = local.ip;
+  final submask = local.submask;
+  String? broadcast;
+
+  if (localIp == null || submask == null || maskToPrefix(submask) == null) {
+    // No usable interface info: keep the /24 guess this app always used.
+    broadcast = '${ip.substring(0, ip.lastIndexOf("."))}.255';
+  } else if (sameSubnet(ip, localIp, submask)) {
+    broadcast = broadcastAddress(localIp, submask);
+  }
+
   try {
     await WakeOnLAN(ipv4Address, macAddress, port: validPort).wake(repeat: 3);
-    await Future.delayed(const Duration(seconds: 1));
-    await WakeOnLAN(ipv4Broadcast, macAddress, port: validPort).wake(repeat: 3);
+
+    if (broadcast != null) {
+      await Future.delayed(const Duration(seconds: 1));
+      await WakeOnLAN(
+        IPAddress(broadcast),
+        macAddress,
+        port: validPort,
+      ).wake(repeat: 3);
+    }
+
     yield WolSent(ip);
   } catch (_) {
     yield WolSendFailed(ip);
@@ -160,9 +210,10 @@ Stream<Message> sendWolPackage({required NetworkDevice device}) async* {
 /// accumulates the messages in a list and yields the list after each message
 Stream<List<Message>> sendWolAndGetMessages({
   required NetworkDevice device,
+  WifiNetwork wifi = wifiNetwork,
 }) async* {
   final List<Message> messages = [];
-  await for (final message in sendWolPackage(device: device)) {
+  await for (final message in sendWolPackage(device: device, wifi: wifi)) {
     // a ping attempt supersedes the previous one instead of stacking up
     if (messages.isNotEmpty &&
         messages.last is PingAttempt &&

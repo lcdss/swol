@@ -10,6 +10,45 @@ int ipToNumeric(String ipAddress) {
   return numeric;
 }
 
+String numericToIp(int numeric) =>
+    '${(numeric >> 24) & 255}.${(numeric >> 16) & 255}.'
+    '${(numeric >> 8) & 255}.${numeric & 255}';
+
+/// The prefix length of a dotted-decimal submask, or null when the mask is
+/// not a contiguous run of ones (e.g. 255.0.255.0).
+int? maskToPrefix(String submask) {
+  final numeric = ipToNumeric(submask);
+
+  for (var prefix = 0; prefix <= 32; prefix++) {
+    final expected = prefix == 0
+        ? 0
+        : (0xFFFFFFFF << (32 - prefix)) & 0xFFFFFFFF;
+
+    if (numeric == expected) return prefix;
+  }
+
+  return null;
+}
+
+bool sameSubnet(String a, String b, String submask) {
+  final mask = ipToNumeric(submask);
+
+  return (ipToNumeric(a) & mask) == (ipToNumeric(b) & mask);
+}
+
+String broadcastAddress(String ip, String submask) {
+  final mask = ipToNumeric(submask);
+
+  return numericToIp((ipToNumeric(ip) & mask) | (~mask & 0xFFFFFFFF));
+}
+
+/// e.g. ('192.168.1.17', '255.255.255.0') -> '192.168.1.0/24'
+String cidrNotation(String ip, String submask) {
+  final network = ipToNumeric(ip) & ipToNumeric(submask);
+
+  return '${numericToIp(network)}/${maskToPrefix(submask)}';
+}
+
 bool isHost(String value) {
   return RegExp(AppConstants.hostValidationRegex).hasMatch(value);
 }

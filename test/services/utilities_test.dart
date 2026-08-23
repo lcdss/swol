@@ -95,4 +95,64 @@ void main() {
       expect(await hostToIp('localhost'), '127.0.0.1');
     });
   });
+
+  group('subnet math', () {
+    test('numericToIp round-trips with ipToNumeric', () {
+      const ips = ['0.0.0.0', '10.1.37.9', '192.168.150.18', '255.255.255.255'];
+
+      for (final ip in ips) {
+        expect(numericToIp(ipToNumeric(ip)), ip);
+      }
+    });
+
+    test('maskToPrefix reads contiguous masks', () {
+      expect(maskToPrefix('255.255.255.0'), 24);
+      expect(maskToPrefix('255.255.254.0'), 23);
+      expect(maskToPrefix('255.255.255.252'), 30);
+      expect(maskToPrefix('255.0.0.0'), 8);
+      expect(maskToPrefix('0.0.0.0'), 0);
+      expect(maskToPrefix('255.255.255.255'), 32);
+    });
+
+    test('maskToPrefix rejects a mask with holes', () {
+      expect(maskToPrefix('255.0.255.0'), isNull);
+      expect(maskToPrefix('0.255.255.255'), isNull);
+    });
+
+    test('sameSubnet honours the mask width', () {
+      // The /23 from the upstream bug report: both halves are one subnet.
+      expect(
+        sameSubnet('192.168.150.18', '192.168.151.20', '255.255.254.0'),
+        isTrue,
+      );
+      expect(
+        sameSubnet('192.168.150.18', '192.168.152.1', '255.255.254.0'),
+        isFalse,
+      );
+      expect(
+        sameSubnet('192.168.150.18', '192.168.151.20', '255.255.255.0'),
+        isFalse,
+      );
+    });
+
+    test('broadcastAddress derives the real broadcast', () {
+      expect(
+        broadcastAddress('192.168.150.18', '255.255.254.0'),
+        '192.168.151.255',
+      );
+      expect(
+        broadcastAddress('192.168.1.10', '255.255.255.0'),
+        '192.168.1.255',
+      );
+      expect(broadcastAddress('10.1.2.3', '255.0.0.0'), '10.255.255.255');
+    });
+
+    test('cidrNotation prints the network the phone is on', () {
+      expect(cidrNotation('192.168.1.17', '255.255.255.0'), '192.168.1.0/24');
+      expect(
+        cidrNotation('192.168.151.20', '255.255.254.0'),
+        '192.168.150.0/23',
+      );
+    });
+  });
 }
