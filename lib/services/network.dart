@@ -161,7 +161,8 @@ Stream<List<Message>> sendWolAndGetMessages({
       messages.removeLast();
     }
     messages.add(message);
-    yield messages;
+    // A copy, so a consumer holding an earlier event does not see it mutate.
+    yield List.unmodifiable(messages);
   }
 }
 

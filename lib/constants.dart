@@ -36,11 +36,25 @@ class AppConstants {
   // Form Elements
   static const formIcon = Icons.done_rounded;
   static const nameValidationRegex = r'^.{1,100}$';
-  static const hostValidationRegex = r'^([a-z]+\.){1,}[a-z]{2,}$';
-  static const ipValidationRegex =
-      r'^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}|([a-z]+\.){1,}[a-z]{2,}$';
+
+  /// One IPv4 octet, 0-255.
+  static const _octet = r'(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)';
+
+  /// A dotted hostname. Labels are letters only so that a dotted quad is never
+  /// mistaken for a name and sent to the resolver -- see [isHost]. Digits and
+  /// hyphens in labels are therefore not accepted.
+  static const _hostname = r'(?:[a-zA-Z]+\.)+[a-zA-Z]{2,}';
+
+  /// Note the outer group: without it the alternation would bind to the
+  /// anchors, leaving each branch anchored at only one end, and `hasMatch`
+  /// would accept trailing or leading junk.
+  static const hostValidationRegex = '^$_hostname\$';
+  static const ipValidationRegex = '^(?:$_octet(?:\\.$_octet){3}|$_hostname)\$';
+
+  /// Matches any prefix of the above, so the field can be validated while the
+  /// user is still typing.
   static const ipSubStringValidationRegex =
-      r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9]{1,2})\.){0,3}((25[0-5]|2[0-4][0-9]|[01]?[0-9]{1,2}))?|([a-z]+\.){1,}[a-z]{2,}$';
+      '^(?:$_octet?(?:\\.$_octet?){0,3}|(?:[a-zA-Z]+\\.?)*)\$';
   static const macValidationRegex =
       r'^(?:[0-9A-Fa-f]{2}([-:]))(?:[0-9A-Fa-f]{2}\1){4}[0-9A-Fa-f]{2}$';
   static const macSubStringValidationRegex =
