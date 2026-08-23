@@ -110,6 +110,32 @@ void main() {
       expect(paste('aabb.ccdd.eeff'), 'aa:bb:cc:dd:ee:ff');
     });
 
+    test('normalizes a paste that replaces a selection', () {
+      // Regression: the paste detection compared lengths, so pasting a bare
+      // MAC over a longer selected value was not recognized as a paste.
+      final formatter = MACAddressFormatter();
+      final existing = value('AA:BB:CC:DD:EE:FF');
+
+      expect(
+        formatter.formatEditUpdate(existing, value('aabbccddeeff')).text,
+        'aa:bb:cc:dd:ee:ff',
+      );
+    });
+
+    test('keeps the typed notation when the last character completes it', () {
+      final formatter = MACAddressFormatter();
+
+      expect(
+        formatter
+            .formatEditUpdate(
+              value('AA-BB-CC-DD-EE-F'),
+              value('AA-BB-CC-DD-EE-FF'),
+            )
+            .text,
+        'AA-BB-CC-DD-EE-FF',
+      );
+    });
+
     test('leaves a paste that is not a full MAC alone', () {
       final formatter = MACAddressFormatter();
 

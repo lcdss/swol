@@ -125,8 +125,12 @@ class MACAddressFormatter extends CustomSeparatorFormatter {
   ) {
     // A pasted MAC arrives in whatever notation the source used -- hyphens,
     // Cisco dots, or no separators at all. Reformat it instead of bouncing
-    // the user to a text editor first.
-    if (newValue.text.length > oldValue.text.length + 1) {
+    // the user to a text editor first. Anything but a single typed character
+    // counts as a paste, so pasting over a selection qualifies even when the
+    // replacement is shorter than what it replaces.
+    final singleCharTyped = newValue.text.length == oldValue.text.length + 1;
+
+    if (!singleCharTyped) {
       final hex = newValue.text.replaceAll(RegExp(r'[:\-.\s]'), '');
 
       if (_bareMac.hasMatch(hex)) {

@@ -46,8 +46,10 @@ Future<({String? ip, String? submask})> wifiNetwork() async {
 
 /// Sweeps every host address of the subnet [localIp] sits on with 25
 /// concurrent chains, reporting progress in [0, 1] after every probe.
-/// Subnets wider than /22 are clamped to the /22 block around [localIp] so
-/// the sweep stays bounded; devices outside it can still be added manually.
+/// The swept block is clamped to [/22, /30]: wider subnets scan only the
+/// /22 around [localIp] so the sweep stays bounded, and point-to-point
+/// /31-/32 masks widen to the surrounding /30. Devices outside the block
+/// can still be added manually.
 Stream<NetworkDevice> findDevicesInNetwork(
   String localIp,
   String submask,
@@ -67,21 +69,31 @@ Stream<NetworkDevice> findDevicesInNetwork(
   var chainsLeft = chainCount;
 
   Future<void> scanChain(int offset) async {
-    for (var index = offset; index < hostCount; index += chainCount) {
-      final device = await probe(numericToIp(firstHost + index));
+    try {
+      for (var index = offset; index < hostCount; index += chainCount) {
+        NetworkDevice? device;
 
-      if (device != null) {
-        controller.add(device);
+        try {
+          device = await probe(numericToIp(firstHost + index));
+        } catch (_) {
+          // An erroring probe is indistinguishable from silence: that
+          // address just is not a reachable device.
+          device = null;
+        }
+
+        if (device != null) {
+          controller.add(device);
+        }
+
+        progressCallback(++probed / hostCount);
       }
-
-      progressCallback(++probed / hostCount);
-    }
-
-    // Close only once every chain is done. Closing when the last address
-    // completes, as this used to, let a slower sibling chain add() to a
-    // closed controller.
-    if (--chainsLeft == 0) {
-      await controller.close();
+    } finally {
+      // Close only once every chain is done -- even one that died, or the
+      // stream never ends. Closing when the last address completes, as this
+      // used to, let a slower sibling chain add() to a closed controller.
+      if (--chainsLeft == 0) {
+        await controller.close();
+      }
     }
   }
 
@@ -171,7 +183,13 @@ Stream<Message> sendWakePackets({
   final submask = local.submask;
   String? broadcast;
 
-  if (localIp == null || submask == null || maskToPrefix(submask) == null) {
+  final wifiUnusable =
+      localIp == null ||
+      !isValidIpv4(localIp) ||
+      submask == null ||
+      maskToPrefix(submask) == null;
+
+  if (wifiUnusable) {
     // No usable interface info: keep the /24 guess this app always used.
     broadcast = '${ip.substring(0, ip.lastIndexOf("."))}.255';
   } else if (sameSubnet(ip, localIp, submask)) {

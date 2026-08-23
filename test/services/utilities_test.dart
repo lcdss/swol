@@ -154,5 +154,26 @@ void main() {
         '192.168.150.0/23',
       );
     });
+
+    test('isValidIpv4 accepts quads and rejects everything else', () {
+      expect(isValidIpv4('192.168.1.10'), isTrue);
+      expect(isValidIpv4('0.0.0.0'), isTrue);
+      expect(isValidIpv4('255.255.255.255'), isTrue);
+
+      expect(isValidIpv4('192.168.1'), isFalse);
+      expect(isValidIpv4('192.168.1.256'), isFalse);
+      expect(isValidIpv4('192.168.1.-1'), isFalse);
+      expect(isValidIpv4('192.168.01.1'), isFalse);
+      expect(isValidIpv4('nas.local'), isFalse);
+      expect(isValidIpv4(''), isFalse);
+    });
+
+    test('maskToPrefix rejects a malformed mask instead of crashing', () {
+      // getWifiSubmask is plugin output, not user input -- it has returned
+      // junk on emulators, and this null is the only guard downstream.
+      expect(maskToPrefix('255.255'), isNull);
+      expect(maskToPrefix('garbage'), isNull);
+      expect(maskToPrefix(''), isNull);
+    });
   });
 }

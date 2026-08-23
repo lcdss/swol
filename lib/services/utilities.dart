@@ -14,9 +14,30 @@ String numericToIp(int numeric) =>
     '${(numeric >> 24) & 255}.${(numeric >> 16) & 255}.'
     '${(numeric >> 8) & 255}.${numeric & 255}';
 
+/// Whether [value] is a well-formed dotted-decimal IPv4 address.
+bool isValidIpv4(String value) {
+  final parts = value.split('.');
+
+  if (parts.length != 4) return false;
+
+  for (final part in parts) {
+    final octet = int.tryParse(part);
+
+    if (octet == null || octet < 0 || octet > 255 || part != octet.toString()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 /// The prefix length of a dotted-decimal submask, or null when the mask is
-/// not a contiguous run of ones (e.g. 255.0.255.0).
+/// malformed or not a contiguous run of ones (e.g. 255.0.255.0). The null
+/// return doubles as the "is this submask usable at all" check, so junk from
+/// getWifiSubmask never reaches the subnet math.
 int? maskToPrefix(String submask) {
+  if (!isValidIpv4(submask)) return null;
+
   final numeric = ipToNumeric(submask);
 
   for (var prefix = 0; prefix <= 32; prefix++) {
@@ -43,6 +64,8 @@ String broadcastAddress(String ip, String submask) {
 }
 
 /// e.g. ('192.168.1.17', '255.255.255.0') -> '192.168.1.0/24'
+///
+/// [submask] must satisfy [maskToPrefix]; callers check before formatting.
 String cidrNotation(String ip, String submask) {
   final network = ipToNumeric(ip) & ipToNumeric(submask);
 

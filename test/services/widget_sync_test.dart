@@ -39,7 +39,10 @@ void main() {
   test('saves only what the widget renders, then redraws it', () async {
     await syncDevicesToWidget([device()]);
 
-    final save = calls.singleWhere((call) => call.method == 'saveWidgetData');
+    final save = calls.singleWhere(
+      (call) =>
+          call.method == 'saveWidgetData' && call.arguments['id'] == 'devices',
+    );
     final payload = json.decode(save.arguments['data']) as List;
 
     expect(payload, [
@@ -47,12 +50,25 @@ void main() {
     ]);
     expect(save.arguments['id'], 'devices');
     expect(calls.last.method, 'updateWidget');
+
+    // Every sync clears a status a dead background callback may have left.
+    for (final key in ['statusKind', 'statusName']) {
+      final cleared = calls.singleWhere(
+        (call) =>
+            call.method == 'saveWidgetData' && call.arguments['id'] == key,
+      );
+
+      expect(cleared.arguments['data'], isNull);
+    }
   });
 
   test('falls back to the address when a device has no name', () async {
     await syncDevicesToWidget([device(hostName: '')]);
 
-    final save = calls.singleWhere((call) => call.method == 'saveWidgetData');
+    final save = calls.singleWhere(
+      (call) =>
+          call.method == 'saveWidgetData' && call.arguments['id'] == 'devices',
+    );
     final payload = json.decode(save.arguments['data']) as List;
 
     expect((payload.single as Map)['hostName'], '192.168.1.10');
@@ -64,7 +80,10 @@ void main() {
       device(id: 'a', hostName: 'Alpha'),
     ]);
 
-    final save = calls.singleWhere((call) => call.method == 'saveWidgetData');
+    final save = calls.singleWhere(
+      (call) =>
+          call.method == 'saveWidgetData' && call.arguments['id'] == 'devices',
+    );
     final payload = json.decode(save.arguments['data']) as List;
 
     expect(payload.map((entry) => entry['hostName']), ['Alpha', 'zeta']);

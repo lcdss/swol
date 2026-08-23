@@ -254,6 +254,35 @@ void main() {
       expect(devices, isEmpty);
     });
 
+    test('a probe that throws neither hangs the stream nor kills it', () async {
+      // Regression: an uncaught probe error killed its chain, so chainsLeft
+      // never reached zero and the stream stayed open forever.
+      final progresses = <double>[];
+      var probes = 0;
+
+      final devices = await findDevicesInNetwork(
+        '192.168.1.5',
+        '255.255.255.0',
+        (progress) {
+          progresses.add(progress);
+        },
+        probe: (ip) async {
+          probes++;
+
+          if (ip.endsWith('.7')) throw StateError('probe blew up');
+
+          return ip.endsWith('.9') ? NetworkDevice(ipAddress: ip) : null;
+        },
+      ).toList();
+
+      expect(probes, 254);
+      expect(progresses.last, 1.0);
+      expect(
+        devices.map((device) => device.ipAddress),
+        contains('192.168.1.9'),
+      );
+    });
+
     test('sweeps the whole subnet when it is wider than /24', () async {
       // Regression: the sweep assumed /24, so on this /23 the upper half of
       // the network was never probed at all.

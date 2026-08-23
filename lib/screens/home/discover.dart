@@ -69,7 +69,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
   Future<({String ip, String submask})?> _resolveNetwork() async {
     final ip = await NetworkInfo().getWifiIP();
 
-    if (ip == null || !ip.contains('.')) return null;
+    // A malformed quad would blow up in the subnet math downstream.
+    if (ip == null || !isValidIpv4(ip)) return null;
 
     final submask = await NetworkInfo().getWifiSubmask();
     final usable = submask != null && maskToPrefix(submask) != null;

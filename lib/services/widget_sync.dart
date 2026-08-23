@@ -26,6 +26,10 @@ Future<void> syncDevicesToWidget(List<StorageDevice> devices) async {
 
   try {
     await HomeWidget.saveWidgetData('devices', json.encode(payload));
+    // Clears any "Waking..." left behind by a background callback that was
+    // killed mid-send; otherwise it would sit on the widget forever.
+    await HomeWidget.saveWidgetData('statusKind', null);
+    await HomeWidget.saveWidgetData('statusName', null);
     await HomeWidget.updateWidget(androidName: androidWidgetName);
   } catch (_) {}
 }
