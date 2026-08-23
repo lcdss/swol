@@ -86,7 +86,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
     _subscription = stream.listen(
       (device) {
         if (!mounted) {
-          // Exit the loop if the widget is no longer mounted.
+          // Cancel before dropping the reference; dispose() has already run
+          // by the time mounted is false, so nothing else will.
+          _subscription?.cancel();
           _subscription = null;
           return;
         }

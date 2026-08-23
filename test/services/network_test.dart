@@ -87,6 +87,67 @@ void main() {
     });
   });
 
+  group('findDevicesInNetwork', () {
+    /// A probe that answers for [alive] addresses, taking [delays] into
+    /// account so chain-finishing order can be forced.
+    DeviceProbe fakeProbe({
+      Set<int> alive = const {},
+      Map<int, Duration> delays = const {},
+    }) => (String ipAddress) async {
+      final index = int.parse(ipAddress.split('.').last);
+      final delay = delays[index];
+
+      if (delay != null) await Future.delayed(delay);
+
+      if (!alive.contains(index)) return null;
+
+      return NetworkDevice(ipAddress: ipAddress);
+    };
+
+    test('probes all 254 addresses and finishes at 100%', () async {
+      final progress = <double>[];
+      final devices = await findDevicesInNetwork(
+        '192.168.1',
+        progress.add,
+        probe: fakeProbe(alive: {1, 42, 254}),
+      ).toList();
+
+      expect(devices.map((d) => d.ipAddress), {
+        '192.168.1.1',
+        '192.168.1.42',
+        '192.168.1.254',
+      });
+      expect(progress, hasLength(254));
+      expect(progress.last, 1.0);
+    });
+
+    test('a device found after .254 completes still arrives', () async {
+      // Regression: the stream used to close as soon as the chain containing
+      // .254 finished, so a slower sibling chain would add() to a closed
+      // controller (StateError) and its device was lost.
+      final devices = await findDevicesInNetwork(
+        '192.168.1',
+        (_) {},
+        probe: fakeProbe(
+          alive: {253},
+          delays: {253: const Duration(milliseconds: 100)},
+        ),
+      ).toList();
+
+      expect(devices.single.ipAddress, '192.168.1.253');
+    });
+
+    test('reports an empty subnet with no devices and no error', () async {
+      final devices = await findDevicesInNetwork(
+        '192.168.1',
+        (_) {},
+        probe: fakeProbe(),
+      ).toList();
+
+      expect(devices, isEmpty);
+    });
+  });
+
   group('sendWolAndGetMessages', () {
     test('accumulates messages, yielding the list so far each time', () async {
       final snapshots = await sendWolAndGetMessages(

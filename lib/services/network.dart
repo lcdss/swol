@@ -9,55 +9,64 @@ import 'package:swol/constants.dart';
 
 import 'data.dart';
 
-Stream<NetworkDevice> findDevicesInNetwork(
-  String networkPrefix,
-  void Function(double) progressCallback,
-) {
-  final controller = StreamController<NetworkDevice>();
-  var progress = 0;
-  const step = 25;
+/// Probes a single address, returning the device when it answers the ping and
+/// null when it does not. The hostname comes from a best-effort reverse
+/// lookup.
+typedef DeviceProbe = Future<NetworkDevice?> Function(String ipAddress);
 
-  /* Recursive function which pings a single device and schedules the next ping
-    step ips away from the current as long as this ip is still within the subnet */
-  void pingDevice(int index) async {
-    final address = '$networkPrefix.$index';
-    final ping = Ping(address, count: 1, timeout: AppConstants.homePingTimeout);
+Future<NetworkDevice?> probeDevice(String ipAddress) async {
+  final ping = Ping(ipAddress, count: 1, timeout: AppConstants.homePingTimeout);
 
-    // Wait for the current ping to complete
-    await for (final event in ping.stream) {
-      if (event is PingResponse) {
-        // try to get the hostname of the device
-        String host = "";
-        try {
-          await InternetAddress(address)
-              .reverse()
-              .then((value) => host = value.host);
-        } on SocketException {
-          host = "";
-        }
-        controller.add(NetworkDevice(ipAddress: address, hostName: host));
-        break;
+  await for (final event in ping.stream) {
+    if (event is PingResponse) {
+      String host = "";
+      try {
+        host = (await InternetAddress(ipAddress).reverse()).host;
+      } on SocketException {
+        host = "";
       }
-    }
 
-    // If the end of the subnet is reached, close the stream
-    if (index == 254) {
-      controller.close();
-    }
-
-    // Increase the progress variable and report the result to the UI
-    final progressPercent = ++progress / 255;
-    progressCallback(progressPercent);
-
-    // Schedule the next ping
-    if (index + step < 255) {
-      pingDevice(index + step);
+      return NetworkDevice(ipAddress: ipAddress, hostName: host);
     }
   }
 
-  // Start the initial pings.
-  for (int i = 1; i <= step; i++) {
-    pingDevice(i);
+  return null;
+}
+
+/// Sweeps `networkPrefix.1` through `.254` with [_chainCount] concurrent
+/// chains, reporting progress in [0, 1] after every probe.
+Stream<NetworkDevice> findDevicesInNetwork(
+  String networkPrefix,
+  void Function(double) progressCallback, {
+  DeviceProbe probe = probeDevice,
+}) {
+  const chainCount = 25;
+  const lastIndex = 254;
+
+  final controller = StreamController<NetworkDevice>();
+  var probed = 0;
+  var chainsLeft = chainCount;
+
+  Future<void> scanChain(int start) async {
+    for (var index = start; index <= lastIndex; index += chainCount) {
+      final device = await probe('$networkPrefix.$index');
+
+      if (device != null) {
+        controller.add(device);
+      }
+
+      progressCallback(++probed / lastIndex);
+    }
+
+    // Close only once every chain is done. Closing when .254 completes, as
+    // this used to, let a slower sibling chain add() to a closed controller.
+    if (--chainsLeft == 0) {
+      await controller.close();
+    }
+  }
+
+  for (var start = 1; start <= chainCount; start++) {
+    unawaited(scanChain(start));
   }
 
   return controller.stream;
