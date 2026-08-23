@@ -195,10 +195,12 @@ class _SettingsPageState extends State<SettingsPage> {
           leftOnPressed: () => Navigator.pop(context),
           rightText: AppLocalizations.of(context)!
               .settingsResetDialogConfirmButton,
-          rightOnPressed: () => {
-            deviceStorage.deleteAllDevices(),
-            deviceStorage.saveDevices(importedDevices),
-            Navigator.pop(context),
+          rightOnPressed: () async {
+            // A plain overwrite. Deleting first raced the unawaited write:
+            // when the delete landed second, the imported list was lost.
+            await deviceStorage.saveDevices(importedDevices);
+
+            if (context.mounted) Navigator.pop(context);
           },
         );
       },

@@ -6,12 +6,14 @@ import 'package:share_plus/share_plus.dart';
 import '../../services/database.dart';
 
 Future<void> shareJsonFile() async {
-  final deviceStorage = DeviceStorage();
+  const deviceStorage = DeviceStorage();
   final filePath = await deviceStorage.getFilePath();
 
   final file = File(filePath);
   if (!await file.exists()) {
-    await file.create();
+    // Nothing saved yet: export a valid empty list, not the 0-byte file
+    // file.create() used to leave, which failed to import as JSON.
+    await deviceStorage.saveDevices(const []);
   }
 
   await SharePlus.instance.share(

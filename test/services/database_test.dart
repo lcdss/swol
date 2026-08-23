@@ -128,6 +128,23 @@ void main() {
       expect(loaded.single.ipAddress, '192.168.1.10');
     });
 
+    test('saveDevices replaces the previous list completely', () async {
+      // The import flow relies on a save being a full overwrite, with no
+      // delete step to race against.
+      await storage.saveDevices([device(id: 'old-1'), device(id: 'old-2')]);
+      await storage.saveDevices([device(id: 'new-1')]);
+
+      final reloaded = await storage.loadDevices();
+      expect(reloaded.map((d) => d.id), ['new-1']);
+    });
+
+    test('saveDevices round-trips an empty list', () async {
+      // What an export with no devices now produces.
+      await storage.saveDevices(const []);
+
+      expect(await storage.loadDevices(), isEmpty);
+    });
+
     test('addDevice assigns an id and returns the new list', () async {
       final (devices, added) = await storage.addDevice(
         NetworkDevice(
