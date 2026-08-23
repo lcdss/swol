@@ -1,0 +1,127 @@
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:swol/services/form_input_formatters.dart';
+
+TextEditingValue value(String text) => TextEditingValue(
+  text: text,
+  selection: TextSelection.collapsed(offset: text.length),
+);
+
+/// Feeds [text] one character at a time, the way a keyboard would, so the
+/// auto-separator behaviour is exercised rather than the paste shortcut.
+String typeOut(TextInputFormatter formatter, String text) {
+  var current = TextEditingValue.empty;
+  for (final char in text.split('')) {
+    final typed = value('${current.text}$char');
+    current = formatter.formatEditUpdate(current, typed);
+  }
+
+  return current.text;
+}
+
+void main() {
+  group('MACAddressFormatter', () {
+    test('inserts a colon after every pair', () {
+      expect(
+        typeOut(MACAddressFormatter(), 'AABBCCDDEEFF'),
+        'AA:BB:CC:DD:EE:FF',
+      );
+    });
+
+    test('does not add a trailing separator after the last pair', () {
+      final formatted = typeOut(MACAddressFormatter(), 'AABBCCDDEEFF');
+
+      expect(formatted.endsWith(':'), isFalse);
+      expect(formatted.split(':'), hasLength(6));
+    });
+
+    test('accepts lowercase hex', () {
+      expect(
+        typeOut(MACAddressFormatter(), 'aabbccddeeff'),
+        'aa:bb:cc:dd:ee:ff',
+      );
+    });
+
+    test('rejects a non-hex character instead of inserting it', () {
+      final formatter = MACAddressFormatter();
+      final existing = value('AA:BB');
+
+      expect(
+        formatter.formatEditUpdate(existing, value('AA:BBZ')).text,
+        'AA:BB',
+      );
+    });
+
+    test('typing a dash switches the whole field to dashes', () {
+      final formatter = MACAddressFormatter();
+      final existing = value('AA:BB');
+
+      expect(
+        formatter.formatEditUpdate(existing, value('AA:BB-')).text,
+        'AA-BB',
+      );
+    });
+
+    test('lets a paste through without reformatting', () {
+      final formatter = MACAddressFormatter();
+
+      expect(
+        formatter
+            .formatEditUpdate(
+              TextEditingValue.empty,
+              value('AA:BB:CC:DD:EE:FF'),
+            )
+            .text,
+        'AA:BB:CC:DD:EE:FF',
+      );
+    });
+
+    test('stops accepting input past six pairs', () {
+      final formatter = MACAddressFormatter();
+      final full = value('AA:BB:CC:DD:EE:FF');
+
+      expect(
+        formatter.formatEditUpdate(full, value('AA:BB:CC:DD:EE:FFA')).text,
+        'AA:BB:CC:DD:EE:FF',
+      );
+    });
+  });
+
+  group('IPAddressFormatter', () {
+    test('accepts a dotted quad typed character by character', () {
+      expect(typeOut(IPAddressFormatter(), '192.168.1.10'), '192.168.1.10');
+    });
+
+    test('does not insert dots on its own', () {
+      // autoSeparate is off for IPs, so the user types the dots.
+      expect(typeOut(IPAddressFormatter(), '192'), '192');
+    });
+
+    test('rejects an octet above 255', () {
+      final formatter = IPAddressFormatter();
+
+      expect(formatter.formatEditUpdate(value('25'), value('256')).text, '25');
+    });
+
+    test('rejects a letter', () {
+      final formatter = IPAddressFormatter();
+
+      expect(
+        formatter.formatEditUpdate(value('192.168.'), value('192.168.x')).text,
+        '192.168.',
+      );
+    });
+
+    test('rejects a fifth octet', () {
+      final formatter = IPAddressFormatter();
+
+      expect(
+        formatter
+            .formatEditUpdate(value('192.168.1.10'), value('192.168.1.10.'))
+            .text,
+        '192.168.1.10',
+      );
+    });
+  });
+}
