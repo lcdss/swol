@@ -1,0 +1,53 @@
+android/app/src/main/res/values-v31/colors.xml
+  s_cdff33ff6f716c::t_68d5ff7512a383 1-7
+test/services/widget_service_test.dart
+  s_cdff33ff6f716c::t_8ff55ff710f402 1-66
+android/app/src/main/res/values/strings.xml
+  s_cdff33ff6f716c::t_59eff18ce17994 1-8
+android/app/src/main/res/drawable/widget_background.xml
+  s_cdff33ff6f716c::t_7b207978162f67 1-5
+android/app/src/main/res/layout/widget_device_list.xml
+  s_cdff33ff6f716c::t_3c589bb25fe003 1-44
+android/app/src/main/res/xml/device_list_widget_info.xml
+  s_cdff33ff6f716c::t_319052e9d3d3ba 1-12
+lib/services/widget_service.dart
+  s_cdff33ff6f716c::t_bd729fb0272b51 1-65
+android/app/src/main/res/layout/widget_device_row.xml
+  s_cdff33ff6f716c::t_83437c1959f308 1-28
+android/app/src/main/res/values-night-v31/colors.xml
+  s_cdff33ff6f716c::t_0c1af04600d221 1-6
+android/app/src/main/res/values/colors.xml
+  s_cdff33ff6f716c::t_ad0184750a6218 1-6
+android/app/src/main/res/drawable/ic_widget_power.xml
+  s_cdff33ff6f716c::t_46039b7f2b1444 1-13
+android/app/src/main/res/values-night/colors.xml
+  s_cdff33ff6f716c::t_1d38ba2881269d 1-6
+android/app/src/main/kotlin/dev/lcss/swol/DeviceListWidgetProvider.kt
+  s_cdff33ff6f716c::t_0bac67aa955fcf 1-79
+android/app/src/main/AndroidManifest.xml
+  s_cdff33ff6f716c::t_3de5958d7fa657 36-38,40-58
+lib/main.dart
+  s_cdff33ff6f716c::t_0ec97d222d61ee 14,23
+lib/services/database.dart
+  s_cdff33ff6f716c::t_7386a99e53845e 8,47-53,70,127-128
+pubspec.lock
+  s_cdff33ff6f716c::t_4dd2cbe5fa2613 288-295
+pubspec.yaml
+  s_cdff33ff6f716c::t_149ed84d639d9b 56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "50eb20a7cd466bda12df4c9451c6c17ab31b38b9",
+  "prompts": {},
+  "sessions": {
+    "s_cdff33ff6f716c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "323f008e-1eb2-42c6-9595-03b735f40b0e",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
