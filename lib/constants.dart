@@ -40,10 +40,15 @@ class AppConstants {
   /// One IPv4 octet, 0-255.
   static const _octet = r'(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)';
 
-  /// A dotted hostname. Labels are letters only so that a dotted quad is never
-  /// mistaken for a name and sent to the resolver -- see [isHost]. Digits and
-  /// hyphens in labels are therefore not accepted.
-  static const _hostname = r'(?:[a-zA-Z]+\.)+[a-zA-Z]{2,}';
+  /// An RFC 1123 hostname label: letters, digits and inner hyphens.
+  static const _label = r'[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?';
+
+  /// A dotted hostname. The final label must start with a letter so that a
+  /// dotted quad is never mistaken for a name and sent to the resolver -- see
+  /// [isHost]. A bare label with no dot is also rejected on purpose: Android
+  /// resolvers apply no search domain, so it could not resolve anyway.
+  static const _hostname =
+      '(?:$_label\\.)+[a-zA-Z](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?';
 
   /// Note the outer group: without it the alternation would bind to the
   /// anchors, leaving each branch anchored at only one end, and `hasMatch`
@@ -51,10 +56,10 @@ class AppConstants {
   static const hostValidationRegex = '^$_hostname\$';
   static const ipValidationRegex = '^(?:$_octet(?:\\.$_octet){3}|$_hostname)\$';
 
-  /// Matches any prefix of the above, so the field can be validated while the
-  /// user is still typing.
-  static const ipSubStringValidationRegex =
-      '^(?:$_octet?(?:\\.$_octet?){0,3}|(?:[a-zA-Z]+\\.?)*)\$';
+  /// Matches while the user is still typing: any run of the characters an IP
+  /// or hostname can contain. The shape is left to [ipValidationRegex] --
+  /// enforcing it per keystroke would reject valid names mid-word.
+  static const ipSubStringValidationRegex = r'^[a-zA-Z0-9.-]*$';
   static const macValidationRegex =
       r'^(?:[0-9A-Fa-f]{2}([-:]))(?:[0-9A-Fa-f]{2}\1){4}[0-9A-Fa-f]{2}$';
   static const macSubStringValidationRegex =

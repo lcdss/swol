@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:swol/constants.dart';
 import 'package:swol/services/utilities.dart';
 
 void main() {
@@ -47,11 +48,40 @@ void main() {
       expect(isHost('Nas.Local'), isTrue);
     });
 
-    test('rejects labels with digits so a dotted quad is never resolved', () {
+    test('accepts digits and hyphens in labels, per RFC 1123', () {
+      expect(isHost('web1.local'), isTrue);
+      expect(isHost('my-nas.lan'), isTrue);
+      expect(isHost('nas-1.home.arpa'), isTrue);
+    });
+
+    test('rejects a label starting or ending with a hyphen', () {
+      expect(isHost('-nas.local'), isFalse);
+      expect(isHost('nas-.local'), isFalse);
+    });
+
+    test('never claims a dotted quad, which must skip the resolver', () {
       // isHost decides whether a value goes to the resolver, so it must not
-      // claim '192.168.1.10'.
+      // claim '192.168.1.10' even though every label is RFC 1123 valid.
       expect(isHost('192.168.1.10'), isFalse);
-      expect(isHost('nas-1.local'), isFalse);
+      expect(isHost('999.999.999.999'), isFalse);
+    });
+  });
+
+  group('ipValidationRegex', () {
+    final regex = RegExp(AppConstants.ipValidationRegex);
+
+    test('accepts addresses and hostnames', () {
+      expect(regex.hasMatch('192.168.1.10'), isTrue);
+      expect(regex.hasMatch('web1.local'), isTrue);
+      expect(regex.hasMatch('my-nas.lan'), isTrue);
+    });
+
+    test('rejects what is neither an address nor a hostname', () {
+      expect(regex.hasMatch('256.1.1.1'), isFalse);
+      expect(regex.hasMatch('192.168.1.10.'), isFalse);
+      expect(regex.hasMatch('nas'), isFalse);
+      expect(regex.hasMatch('-nas.local'), isFalse);
+      expect(regex.hasMatch(''), isFalse);
     });
   });
 

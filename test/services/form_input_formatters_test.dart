@@ -98,29 +98,24 @@ void main() {
       expect(typeOut(IPAddressFormatter(), '192'), '192');
     });
 
-    test('rejects an octet above 255', () {
-      final formatter = IPAddressFormatter();
-
-      expect(formatter.formatEditUpdate(value('25'), value('256')).text, '25');
+    test('accepts hostname characters, leaving the shape to the validator', () {
+      // The field takes an IP or a hostname, so per-keystroke filtering can
+      // only restrict the character set; '256' may be the start of a name.
+      expect(typeOut(IPAddressFormatter(), 'web1.local'), 'web1.local');
+      expect(typeOut(IPAddressFormatter(), 'my-nas.lan'), 'my-nas.lan');
+      expect(typeOut(IPAddressFormatter(), '256'), '256');
     });
 
-    test('rejects a letter', () {
+    test('rejects characters that fit neither an IP nor a hostname', () {
       final formatter = IPAddressFormatter();
 
       expect(
-        formatter.formatEditUpdate(value('192.168.'), value('192.168.x')).text,
+        formatter.formatEditUpdate(value('192.168.'), value('192.168._')).text,
         '192.168.',
       );
-    });
-
-    test('rejects a fifth octet', () {
-      final formatter = IPAddressFormatter();
-
       expect(
-        formatter
-            .formatEditUpdate(value('192.168.1.10'), value('192.168.1.10.'))
-            .text,
-        '192.168.1.10',
+        formatter.formatEditUpdate(value('nas'), value('nas ')).text,
+        'nas',
       );
     });
   });
