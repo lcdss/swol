@@ -1,0 +1,21 @@
+CHANGELOG.md
+  s_7efe093dbda125::t_64f587d51068f6 3-11
+pubspec.yaml
+  s_7efe093dbda125::t_a3b0b93b9a8ecd 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "6187ec3b8574aa20a3bbff60da92f84cfd5ff9e1",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
