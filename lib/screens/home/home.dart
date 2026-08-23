@@ -422,61 +422,76 @@ class _HomePageState extends State<HomePage> {
   /// shows the Alert Dialog for waking the device.
   /// [device] is the device to wake.
   Future<dynamic> showWakeUpDialog(StorageDevice device) {
+    // Created once, outside the builder: dialog rebuilds (rotation, theme or
+    // inset changes) would otherwise create a new stream each time --
+    // resending the magic packets and restarting the ping loop.
+    final messages = sendWolAndGetMessages(device: device.toNetworkDevice());
+
     return showDialog(
       context: context,
       builder: (context) {
         return StreamBuilder<List<Message>>(
-          stream: sendWolAndGetMessages(device: device.toNetworkDevice()),
+          stream: messages,
           builder:
               (BuildContext context, AsyncSnapshot<List<Message>> snapshot) {
+                final l10n = AppLocalizations.of(context)!;
+                final errorColor = Theme.of(context).colorScheme.error;
+
                 // set color, text and icon of dialog box according to the arrived messages
                 Color? color;
-                String rightText = AppLocalizations.of(context)!.cancel;
+                String rightText = l10n.cancel;
                 IconData? rightIcon = AppConstants.denyIcon;
                 if (snapshot.hasData &&
                     snapshot.data!.last.type == MsgType.online) {
                   color = AppConstants.successMessageColor;
-                  rightText = AppLocalizations.of(context)!.done;
+                  rightText = l10n.done;
                   rightIcon = AppConstants.checkIcon;
                 }
 
-                if (snapshot.hasData &&
-                    snapshot.data!.last.type == MsgType.error) {
-                  color = Theme.of(context).colorScheme.error;
-                  rightText = AppLocalizations.of(context)!.ok;
+                if (snapshot.hasError ||
+                    (snapshot.hasData &&
+                        snapshot.data!.last.type == MsgType.error)) {
+                  color = errorColor;
+                  rightText = l10n.ok;
                   rightIcon = null;
                 }
 
-                return customDualChoiceAlertdialog(
-                  title: AppLocalizations.of(context)!.homeWolCardTitle,
-                  child: snapshot.hasData
-                      ? SizedBox(
-                          width: 200,
-                          child: ListView.separated(
-                            separatorBuilder: (context, index) =>
-                                const Divider(),
-                            shrinkWrap: true,
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              final Message message = snapshot.data![index];
-                              return Text(
-                                messageText(
-                                  AppLocalizations.of(context)!,
-                                  message,
-                                ),
-                                style: TextStyle(
-                                  color: (message.type == MsgType.error)
-                                      ? Theme.of(context).colorScheme.error
-                                      : (message.type == MsgType.check ||
-                                            message.type == MsgType.online)
-                                      ? AppConstants.successMessageColor
-                                      : null,
-                                ),
-                              );
-                            },
+                final Widget body;
+                if (snapshot.hasError) {
+                  body = Text(
+                    l10n.homeWolCardUnexpectedError,
+                    style: TextStyle(color: errorColor),
+                  );
+                } else if (snapshot.hasData) {
+                  body = SizedBox(
+                    width: 200,
+                    child: ListView.separated(
+                      separatorBuilder: (context, index) => const Divider(),
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final Message message = snapshot.data![index];
+                        return Text(
+                          messageText(l10n, message),
+                          style: TextStyle(
+                            color: (message.type == MsgType.error)
+                                ? errorColor
+                                : (message.type == MsgType.check ||
+                                      message.type == MsgType.online)
+                                ? AppConstants.successMessageColor
+                                : null,
                           ),
-                        )
-                      : const Center(child: CircularProgressIndicator()),
+                        );
+                      },
+                    ),
+                  );
+                } else {
+                  body = const Center(child: CircularProgressIndicator());
+                }
+
+                return customDualChoiceAlertdialog(
+                  title: l10n.homeWolCardTitle,
+                  child: body,
                   icon: AppConstants.wakeUp,
                   iconColor: color,
                   rightText: rightText,

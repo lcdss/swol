@@ -73,6 +73,9 @@ void main() {
         messages.whereType<WolHostUnresolved>().single.host,
         'unresolvable.invalid',
       );
+      // Regression: the unresolved hostname used to also be run through the
+      // IP validator, producing a second, redundant error message.
+      expect(messages.whereType<WolInvalidIp>(), isEmpty);
       expect(messages.last, isA<WolInvalid>());
     });
 
@@ -85,6 +88,28 @@ void main() {
       expect(messages.whereType<WolSent>(), isEmpty);
       expect(messages.whereType<PingAttempt>(), isEmpty);
     });
+  });
+
+  group('sendWolPackage happy path', () {
+    test('walks the full sequence against loopback', () async {
+      // Loopback is always reachable, so the UDP send and the ping loop
+      // both run for real without depending on the LAN.
+      final messages = await sendWolPackage(
+        device: device(ipAddress: '127.0.0.1'),
+      ).toList();
+
+      expect(messages.first, isA<WolValid>());
+      expect(messages.whereType<WolSending>(), hasLength(1));
+      expect(
+        messages.whereType<WolSent>().length +
+            messages.whereType<WolSendFailed>().length,
+        1,
+        reason: 'exactly one send outcome',
+      );
+      expect(messages.whereType<PingStarted>(), hasLength(1));
+      expect(messages.whereType<PingAttempt>(), isNotEmpty);
+      expect(messages.last, isA<PingSucceeded>());
+    }, timeout: const Timeout(Duration(minutes: 1)));
   });
 
   group('findDevicesInNetwork', () {
@@ -155,11 +180,18 @@ void main() {
       ).toList();
 
       expect(snapshots, isNotEmpty);
-      // Each yield is one longer than the last.
+      // Each yield is one longer than the last and preserves the prefix, so
+      // a consumer can render any snapshot as "everything so far".
       for (var i = 1; i < snapshots.length; i++) {
         expect(snapshots[i].length, snapshots[i - 1].length + 1);
+        expect(snapshots[i].sublist(0, snapshots[i - 1].length), [
+          ...snapshots[i - 1],
+        ]);
       }
-      expect(snapshots.last.last, isA<WolInvalid>());
+      expect(snapshots.last.map((m) => m.runtimeType), [
+        WolInvalidIp,
+        WolInvalid,
+      ]);
     });
   });
 }

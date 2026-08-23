@@ -89,9 +89,9 @@ Stream<Message> sendWolPackage({required NetworkDevice device}) async* {
     } else {
       ip = result;
     }
-  }
-
-  if (!IPAddress.validate(ip).state) {
+  } else if (!IPAddress.validate(ip).state) {
+    // Skipped for hostnames: an unresolved one has already been reported,
+    // and a resolved one is a valid address by construction.
     yield WolInvalidIp(ip);
     invalid = true;
   }

@@ -94,6 +94,7 @@
   },
   "homeWolCardPingSuccess": "Device is online",
   "homeWolCardPingFail": "Device is still offline",
+  "homeWolCardUnexpectedError": "Something went wrong while waking the device",
   "@DISCOVER": {},
   "discoverTitle": "Discover Devices",
   "discoverCardTitle": "Network Scan",
