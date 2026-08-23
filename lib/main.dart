@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:swol/l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -9,12 +10,15 @@ import 'package:swol/constants.dart';
 import 'package:swol/screens/about/about.dart';
 import 'package:swol/screens/home/home.dart';
 import 'package:swol/screens/settings/settings.dart';
+import 'package:swol/services/theme_settings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Get saved theme mode
   final savedThemeMode = await AdaptiveTheme.getThemeMode();
+
+  await loadThemeSettings();
 
   // Get package info
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -33,30 +37,42 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveTheme(
-      light: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.seedColor),
-      ),
-      dark: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppConstants.seedColor,
-          brightness: Brightness.dark,
-        ),
-      ),
-      initial: savedThemeMode ?? AdaptiveThemeMode.system,
-      builder: (ThemeData light, ThemeData dark) => MaterialApp(
-        onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          ...GlobalMaterialLocalizations.delegates,
-        ],
-        supportedLocales: const [
-          Locale('en'), // English
-        ],
-        theme: light,
-        darkTheme: dark,
-        home: MyHomePage(packageInfo: packageInfo),
-      ),
+    return DynamicColorBuilder(
+      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) =>
+          ValueListenableBuilder<bool>(
+            valueListenable: useDynamicColor,
+            builder: (context, dynamicOn, _) {
+              final lightScheme = dynamicOn && lightDynamic != null
+                  ? lightDynamic
+                  : ColorScheme.fromSeed(seedColor: AppConstants.seedColor);
+              final darkScheme = dynamicOn && darkDynamic != null
+                  ? darkDynamic
+                  : ColorScheme.fromSeed(
+                      seedColor: AppConstants.seedColor,
+                      brightness: Brightness.dark,
+                    );
+
+              return AdaptiveTheme(
+                light: ThemeData(colorScheme: lightScheme),
+                dark: ThemeData(colorScheme: darkScheme),
+                initial: savedThemeMode ?? AdaptiveThemeMode.system,
+                builder: (ThemeData light, ThemeData dark) => MaterialApp(
+                  onGenerateTitle: (context) =>
+                      AppLocalizations.of(context)!.appTitle,
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    ...GlobalMaterialLocalizations.delegates,
+                  ],
+                  supportedLocales: const [
+                    Locale('en'), // English
+                  ],
+                  theme: light,
+                  darkTheme: dark,
+                  home: MyHomePage(packageInfo: packageInfo),
+                ),
+              );
+            },
+          ),
     );
   }
 }

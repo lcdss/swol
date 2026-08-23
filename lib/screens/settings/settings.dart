@@ -8,6 +8,7 @@ import 'package:swol/constants.dart';
 
 import '../../services/data.dart';
 import '../../services/database.dart';
+import '../../services/theme_settings.dart';
 import '../../widgets/chip_cards.dart';
 import '../../widgets/layout_elements.dart';
 import '../../widgets/universal_ui_components.dart';
@@ -48,6 +49,20 @@ class _SettingsPageState extends State<SettingsPage> {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const ThemeSwitcher(),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.settingsDynamicColorTitle,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: useDynamicColor,
+                    builder: (context, enabled, _) =>
+                        Switch(value: enabled, onChanged: setUseDynamicColor),
+                  ),
                 ],
               ),
             ],

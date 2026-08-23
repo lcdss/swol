@@ -165,6 +165,7 @@
   "@SETTINGS": {},
   "settingsAppearanceTitle": "Appearance",
   "settingsThemeSelectorTitle": "Theme",
+  "settingsDynamicColorTitle": "System Colors",
   "settingsThemeSelectorLight": "Light",
   "settingsThemeSelectorDark": "Dark",
   "settingsThemeSelectorSystem": "Auto",
