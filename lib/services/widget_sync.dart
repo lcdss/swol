@@ -5,7 +5,7 @@ import 'package:home_widget/home_widget.dart';
 import 'data.dart';
 
 /// The manifest receiver class the update is addressed to.
-const androidWidgetName = 'DeviceListWidgetProvider';
+const androidWidgetName = 'DeviceListWidgetReceiver';
 
 /// Mirrors [devices] into the home screen widget and redraws it, sorted the
 /// way the app's own list opens (alphabetical) since the widget has no sort

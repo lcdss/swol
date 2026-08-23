@@ -38,7 +38,7 @@
             </intent-filter>
         </activity>
         <receiver
-            android:name=".DeviceListWidgetProvider"
+            android:name=".DeviceListWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_title">
             <intent-filter>

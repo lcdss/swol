@@ -4,5 +4,6 @@
     <string name="widget_description">Wake your devices with one tap</string>
     <string name="widget_empty">No devices yet. Open the app to add one.</string>
     <string name="widget_wake">Wake</string>
-    <string name="widget_more">+%1$d more in the app</string>
+    <string name="widget_waking">Waking %1$s…</string>
+    <string name="widget_wake_failed">Couldn\'t wake %1$s</string>
 </resources>

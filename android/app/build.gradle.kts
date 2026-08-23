@@ -2,6 +2,10 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    // The Glance widget is Compose code, so the Compose compiler runs for
+    // the app module too.
+    id("org.jetbrains.kotlin.plugin.compose")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -56,6 +60,10 @@ android {
         }
     }
 
+    buildFeatures {
+        compose = true
+    }
+
     buildTypes {
         release {
             signingConfig = if (hasReleaseKeystore) {
@@ -76,4 +84,12 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("androidx.glance:glance-appwidget:1.1.1")
+    implementation("androidx.glance:glance-material3:1.1.1")
+    // glance-material3 wraps M3 color schemes but does not re-export the
+    // types the fallback palette is built from.
+    implementation("androidx.compose.material3:material3:1.3.2")
 }
