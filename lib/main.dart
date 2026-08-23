@@ -11,6 +11,7 @@ import 'package:swol/screens/about/about.dart';
 import 'package:swol/screens/home/home.dart';
 import 'package:swol/screens/settings/settings.dart';
 import 'package:swol/services/theme_settings.dart';
+import 'package:swol/services/widget_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,7 @@ void main() async {
   final savedThemeMode = await AdaptiveTheme.getThemeMode();
 
   await loadThemeSettings();
+  await registerWidgetInteractivity();
 
   // Get package info
   PackageInfo packageInfo = await PackageInfo.fromPlatform();

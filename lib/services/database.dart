@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 import 'data.dart';
+import 'widget_service.dart';
 
 /// Decodes the persisted device list.
 ///
@@ -43,7 +44,13 @@ class DeviceStorage {
     try {
       final filePath = await getFilePath();
       final file = File(filePath);
-      return parseStorageDevices(await file.readAsString());
+      final devices = parseStorageDevices(await file.readAsString());
+
+      // Keeps a freshly added home screen widget from showing an empty list
+      // until the next edit.
+      await syncDevicesToWidget(devices);
+
+      return devices;
     } on FileSystemException {
       return [];
     } on FormatException {
@@ -60,6 +67,7 @@ class DeviceStorage {
     final jsonString = json.encode(jsonData);
     final file = File(filePath);
     await file.writeAsString(jsonString);
+    await syncDevicesToWidget(devices);
   }
 
   /// Adds a new device to the list of devices
@@ -116,5 +124,7 @@ class DeviceStorage {
     } on FileSystemException {
       // Already gone, which is the desired end state.
     }
+
+    await syncDevicesToWidget(const []);
   }
 }

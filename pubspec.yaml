@@ -53,6 +53,7 @@ dependencies:
   material_ui: ^1.0.1
   dynamic_color: ^2.1.0
   shared_preferences: ^2.5.5
+  home_widget: ^0.9.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
