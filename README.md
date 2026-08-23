@@ -33,9 +33,12 @@ with a mobile application.
 
 ## Features
 
-- Automatic device discovery across the local `/24`
+- Automatic device discovery across the local subnet
 - Live online/offline status for saved devices
 - Devices addressable by IP or by hostname
+- Optional SecureOn password per device
+- Home screen widget that wakes a device in one tap
+- Material You dynamic colors (Android 12+)
 - Export and import the device list as a `json` file (see below)
 
 The app stores the added devices in a `json` file which can be exported and imported within the app
