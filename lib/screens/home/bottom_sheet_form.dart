@@ -58,10 +58,9 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   late final RichTextController _controllerIp;
   late final RichTextController _controllerMac;
 
-  final _formKeyIp = GlobalKey<FormState>();
-  final _formKeyMac = GlobalKey<FormState>();
-  final _formKeyName = GlobalKey<FormState>();
-  final _formKeyPort = GlobalKey<FormState>();
+  // One Form for the whole sheet: fields (the icon selector included) manage
+  // their own error display through it instead of ad-hoc state.
+  final _formKey = GlobalKey<FormState>();
 
   // variables for the chip selectors and initial port value
   int? indexWolSelector;
@@ -189,55 +188,55 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
           20,
           MediaQuery.viewInsetsOf(context).bottom,
         ),
-        child: ListView(
-          primary: true,
-          shrinkWrap: true,
-          children: [
-            dragIndicator(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  widget.title,
-                  style: Theme.of(context).textTheme.headlineSmall,
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            primary: true,
+            shrinkWrap: true,
+            children: [
+              dragIndicator(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.title,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  buildSaveButton(context),
+                ],
+              ),
+              getCustomTextFormField(
+                label: AppLocalizations.of(context)!.formNameHint,
+                controller: _controllerName,
+                validator: createValidator(
+                  AppConstants.nameValidationRegex,
+                  AppLocalizations.of(context)!.formNameError,
                 ),
-                buildSaveButton(context),
-              ],
-            ),
-            getCustomTextFormField(
-              label: AppLocalizations.of(context)!.formNameHint,
-              formKey: _formKeyName,
-              controller: _controllerName,
-              validator: createValidator(
-                AppConstants.nameValidationRegex,
-                AppLocalizations.of(context)!.formNameError,
               ),
-            ),
-            getCustomTextFormField(
-              label: AppLocalizations.of(context)!.formIpHint,
-              formKey: _formKeyIp,
-              controller: _controllerIp,
-              validator: createValidator(
-                AppConstants.ipValidationRegex,
-                AppLocalizations.of(context)!.formIpError,
+              getCustomTextFormField(
+                label: AppLocalizations.of(context)!.formIpHint,
+                controller: _controllerIp,
+                validator: createValidator(
+                  AppConstants.ipValidationRegex,
+                  AppLocalizations.of(context)!.formIpError,
+                ),
+                inputFormatters: [IPAddressFormatter()],
               ),
-              inputFormatters: [IPAddressFormatter()],
-            ),
-            getCustomTextFormField(
-              label: AppLocalizations.of(context)!.formMacHint,
-              formKey: _formKeyMac,
-              controller: _controllerMac,
-              validator: createValidator(
-                AppConstants.macValidationRegex,
-                AppLocalizations.of(context)!.formMacError,
+              getCustomTextFormField(
+                label: AppLocalizations.of(context)!.formMacHint,
+                controller: _controllerMac,
+                validator: createValidator(
+                  AppConstants.macValidationRegex,
+                  AppLocalizations.of(context)!.formMacError,
+                ),
+                inputFormatters: [MACAddressFormatter()],
               ),
-              inputFormatters: [MACAddressFormatter()],
-            ),
-            const SizedBox(height: 20),
-            buildPortSelector(textTheme),
-            buildIconSelector(textTheme),
-            if (widget.deleteButton) buildDeleteButton(),
-          ],
+              const SizedBox(height: 20),
+              buildPortSelector(textTheme),
+              buildIconSelector(textTheme),
+              if (widget.deleteButton) buildDeleteButton(),
+            ],
+          ),
         ),
       ),
     );
@@ -276,23 +275,25 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   /// the user has the option to save the device anyway and the [onSubmitDeviceCallback] is called again or to cancel the operation
   /// [onSubmitDeviceCallback] the callback function that is called when the user decides to save the device
   void validateFormFields({Function()? onSubmitDeviceCallback}) {
-    List<String> errorMessage = [];
+    final l10n = AppLocalizations.of(context)!;
 
-    if (!_formKeyName.currentState!.validate()) {
-      errorMessage.add(AppLocalizations.of(context)!.formErrorMessageName);
-    }
-    if (!_formKeyIp.currentState!.validate()) {
-      errorMessage.add(AppLocalizations.of(context)!.formErrorMessageIp);
-    }
-    if (!_formKeyMac.currentState!.validate()) {
-      errorMessage.add(AppLocalizations.of(context)!.formErrorMessageMac);
-    }
-    if (!_formKeyPort.currentState!.validate()) {
-      errorMessage.add(AppLocalizations.of(context)!.formErrorMessagePort);
-    }
-    if (indexIconSelector == null) {
-      errorMessage.add(AppLocalizations.of(context)!.formErrorMessageType);
-    }
+    // Paints every field's own error text in one pass.
+    _formKey.currentState!.validate();
+
+    bool matches(String regEx, TextEditingController controller) =>
+        RegExp(regEx).hasMatch(controller.text);
+
+    final errorMessage = [
+      if (!matches(AppConstants.nameValidationRegex, _controllerName))
+        l10n.formErrorMessageName,
+      if (!matches(AppConstants.ipValidationRegex, _controllerIp))
+        l10n.formErrorMessageIp,
+      if (!matches(AppConstants.macValidationRegex, _controllerMac))
+        l10n.formErrorMessageMac,
+      if (!matches(AppConstants.portValidationRegex, _controllerPort))
+        l10n.formErrorMessagePort,
+      if (indexIconSelector == null) l10n.formErrorMessageType,
+    ];
 
     if (errorMessage.isNotEmpty) {
       showDialog(
@@ -352,35 +353,31 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
   /// * [label] the label of the text form field
   /// * [controller] the TextEditingController of the text form field
   /// * [validator] a validator function which can be created with [createValidator]
-  /// * [onSaved] the onSaved function called when the form is saved
+  /// * [onChanged] called with the new text on every edit
   Widget getCustomTextFormField({
     String? label,
     required TextEditingController controller,
-    required GlobalKey<FormState> formKey,
     String? Function(String?)? validator,
-    String? Function(String?)? onSaved,
+    void Function(String)? onChanged,
     List<TextInputFormatter>? inputFormatters,
   }) {
     return Padding(
       padding: const EdgeInsets.only(top: 20.0),
-      child: Form(
-        key: formKey,
-        child: TextFormField(
-          inputFormatters: inputFormatters,
-          // Not `always`: that painted every field red the moment the form
-          // opened, before the user had touched anything.
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          validator: validator,
-          controller: controller,
-          onSaved: onSaved,
-          cursorColor: Theme.of(context).colorScheme.primaryContainer,
-          decoration: InputDecoration(
-            isDense: true,
-            labelText: label,
-            errorStyle: const TextStyle(height: 0.1),
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12.0)),
-            ),
+      child: TextFormField(
+        inputFormatters: inputFormatters,
+        // Not `always`: that painted every field red the moment the form
+        // opened, before the user had touched anything.
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: validator,
+        controller: controller,
+        onChanged: onChanged,
+        cursorColor: Theme.of(context).colorScheme.primaryContainer,
+        decoration: InputDecoration(
+          isDense: true,
+          labelText: label,
+          errorStyle: const TextStyle(height: 0.1),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12.0)),
           ),
         ),
       ),
@@ -443,25 +440,21 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
           width: 90,
           child: getCustomTextFormField(
             label: AppLocalizations.of(context)!.formPortHint,
-            formKey: _formKeyPort,
             controller: _controllerPort,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: createValidator(
               AppConstants.portValidationRegex,
               AppLocalizations.of(context)!.formPortError,
             ),
-            onSaved: (String? value) {
-              // TODO ugly
+            // Keep the chips in step with what is typed. The old version
+            // hung off onSaved, which nothing ever called.
+            onChanged: (String value) {
+              final match = chipsWolPorts.indexWhere(
+                (chip) => chip.value.toString() == value,
+              );
               setState(() {
-                if (value == '9') {
-                  indexWolSelector = 1;
-                } else if (value == '7') {
-                  indexWolSelector = 0;
-                } else {
-                  indexWolSelector = null;
-                }
+                indexWolSelector = match == -1 ? null : match;
               });
-              return null;
             },
           ),
         ),
@@ -471,78 +464,89 @@ class _ModularBottomFormPageState extends State<ModularBottomFormPage> {
 
   /// returns a custom selector for the icon of the device
   /// * [textTheme] the text theme of the current context
-  Column buildIconSelector(TextTheme textTheme) {
+  /// A real [FormField], so error display follows the same
+  /// validate-on-interaction rules as every text field instead of being
+  /// faked from raw state (which painted the error before any interaction).
+  Widget buildIconSelector(TextTheme textTheme) {
     List<CustomChoiceChip<String>> chipsDeviceTypes =
         AppConstants.getChipsDeviceTypes(context: context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          AppLocalizations.of(context)!.formIconLabel,
-          style: textTheme.labelLarge,
-        ),
-        const SizedBox(height: 3.0),
-        SizedBox(
-          height: 45,
-          child: ListView(
-            primary: true,
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            children: [
-              Wrap(
-                spacing: 5.0,
-                runSpacing: 0.0,
-                children: List<Widget>.generate(chipsDeviceTypes.length, (
-                  index,
-                ) {
-                  String? label = chipsDeviceTypes[index].label;
-                  IconData? icon = chipsDeviceTypes[index].icon;
-                  return ChoiceChip(
-                    label: IntrinsicWidth(
-                      child: Row(
-                        children: [
-                          if (label != null) Text(label),
-                          if (icon != null) const SizedBox(width: 10.0),
-                          if (icon != null) Icon(icon),
-                        ],
-                      ),
-                    ),
-                    side: indexIconSelector == null
-                        ? BorderSide(color: Theme.of(context).colorScheme.error)
-                        : null,
-                    selected: indexIconSelector == index,
-                    onSelected: (bool selected) {
-                      setState(() {
-                        indexIconSelector = selected ? index : null;
-                        if (selected) {
-                          _controllerIcon.text = chipsDeviceTypes[index].value
-                              .toString();
-                        } else {
-                          _controllerIcon.text = '';
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-            ],
+    return FormField<int>(
+      initialValue: indexIconSelector,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (index) =>
+          index == null ? AppLocalizations.of(context)!.formIconError : null,
+      builder: (field) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            AppLocalizations.of(context)!.formIconLabel,
+            style: textTheme.labelLarge,
           ),
-        ),
-        // error text
-        if (indexIconSelector == null)
-          Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: Text(
-              AppLocalizations.of(context)!.formIconError,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-                fontSize: 12,
-              ),
+          const SizedBox(height: 3.0),
+          SizedBox(
+            height: 45,
+            child: ListView(
+              primary: true,
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              children: [
+                Wrap(
+                  spacing: 5.0,
+                  runSpacing: 0.0,
+                  children: List<Widget>.generate(chipsDeviceTypes.length, (
+                    index,
+                  ) {
+                    String? label = chipsDeviceTypes[index].label;
+                    IconData? icon = chipsDeviceTypes[index].icon;
+                    return ChoiceChip(
+                      label: IntrinsicWidth(
+                        child: Row(
+                          children: [
+                            if (label != null) Text(label),
+                            if (icon != null) const SizedBox(width: 10.0),
+                            if (icon != null) Icon(icon),
+                          ],
+                        ),
+                      ),
+                      side: field.hasError
+                          ? BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                            )
+                          : null,
+                      selected: field.value == index,
+                      onSelected: (bool selected) {
+                        setState(() {
+                          indexIconSelector = selected ? index : null;
+                          if (selected) {
+                            _controllerIcon.text = chipsDeviceTypes[index].value
+                                .toString();
+                          } else {
+                            _controllerIcon.text = '';
+                          }
+                        });
+                        field.didChange(selected ? index : null);
+                      },
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
           ),
-        const SizedBox(height: 15),
-      ],
+          if (field.hasError)
+            Padding(
+              padding: const EdgeInsets.only(left: 12.0),
+              child: Text(
+                field.errorText!,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          const SizedBox(height: 15),
+        ],
+      ),
     );
   }
 

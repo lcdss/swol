@@ -64,6 +64,29 @@ void main() {
     expect(find.text(l10n.formIpError), findsNothing);
     expect(find.text(l10n.formMacError), findsNothing);
     expect(find.text(l10n.formPortError), findsNothing);
+    expect(find.text(l10n.formIconError), findsNothing);
+  });
+
+  testWidgets('icon error shows on save attempt and clears on selection', (
+    tester,
+  ) async {
+    final l10n = await pumpForm(tester);
+
+    await tester.tap(find.text(l10n.formApplyButtonText));
+    await tester.pumpAndSettle();
+
+    // Leave the error dialog to get back to the form.
+    await tester.tap(find.text(l10n.back));
+    await tester.pumpAndSettle();
+
+    expect(find.text(l10n.formIconError), findsOneWidget);
+
+    // Selecting any device type must clear it again.
+    await tester.ensureVisible(find.byIcon(Icons.storage_rounded));
+    await tester.tap(find.byIcon(Icons.storage_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.text(l10n.formIconError), findsNothing);
   });
 
   testWidgets('saving an empty form lists every invalid field', (tester) async {
