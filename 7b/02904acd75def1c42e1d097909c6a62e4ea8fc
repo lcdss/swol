@@ -1,0 +1,26 @@
+lib/services/database.dart
+  s_7efe093dbda125::t_3a99a9bcee50f3 87-92,94
+lib/screens/home/home.dart
+  s_7efe093dbda125::t_708a7d6d28549f 148-149,151
+  s_7efe093dbda125::t_b75c61313bb239 243
+lib/screens/about/about.dart
+  s_7efe093dbda125::t_7b0afd9bd11af9 30-37
+test/services/database_test.dart
+  s_7efe093dbda125::t_1af1bf7b83d0b1 177-186
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "7b02904acd75def1c42e1d097909c6a62e4ea8fc",
+  "prompts": {},
+  "sessions": {
+    "s_7efe093dbda125": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48e9e525-9f92-4219-aaee-e082580892ff",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
