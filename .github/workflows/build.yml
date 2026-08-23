@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    # Deliberately excludes a `+build` suffix: the release step below tags with
-    # the full pubspec version (e.g. v1.3.0+2), so this never matches the tag
-    # the release itself creates.
+    # The release below reuses this same tag. On the workflow_dispatch path
+    # the workflow creates it, which cannot re-trigger this workflow because
+    # tags made with GITHUB_TOKEN never start workflow runs.
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
@@ -79,17 +79,19 @@ jobs:
         id: extract_version
         run: |
           version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
-          echo "VERSION=$version" >> $GITHUB_ENV
+          # Strip the +versionCode: that is Android upgrade bookkeeping, not
+          # part of the release name.
+          echo "VERSION=${version%%+*}" >> $GITHUB_ENV
 
-      # checkout fetches no tags, so without the explicit fetch this check
-      # always came up empty and re-runs minted duplicate releases with
-      # -build-N tags. Now a re-run for an already-released version skips the
-      # release instead.
-      - name: Check if the release tag already exists
-        id: check_tag
+      # The trigger tag and the release tag are the same now, so the tag
+      # existing proves nothing -- check for the release itself, and skip it
+      # on a re-run for an already-released version.
+      - name: Check if this version is already released
+        id: check_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git fetch --tags --quiet
-          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
+          if gh release view "v${{ env.VERSION }}" >/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
             echo "v${{ env.VERSION }} already released; bump the version in pubspec.yaml to release again."
           else
@@ -97,7 +99,7 @@ jobs:
           fi
 
       - name: Create Release
-        if: steps.check_tag.outputs.exists == 'false'
+        if: steps.check_release.outputs.exists == 'false'
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk,build/app/outputs/flutter-apk/app-arm64-v8a-release.apk,build/app/outputs/flutter-apk/app-x86_64-release.apk,build/app/outputs/bundle/release/app-release.aab"
