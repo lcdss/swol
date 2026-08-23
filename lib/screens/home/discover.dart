@@ -31,6 +31,28 @@ class _DiscoverPageState extends State<DiscoverPage> {
   @override
   void initState() {
     super.initState();
+    // Scanning spawns 25 concurrent ping chains; starting it while the page
+    // is still animating in drops frames on the push transition.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final animation = ModalRoute.of(context)?.animation;
+
+      if (animation == null || animation.isCompleted) {
+        _deviceDiscovery();
+      } else {
+        _routeAnimation = animation..addStatusListener(_startScanWhenSettled);
+      }
+    });
+  }
+
+  Animation<double>? _routeAnimation;
+
+  void _startScanWhenSettled(AnimationStatus status) {
+    if (status != AnimationStatus.completed) return;
+
+    _routeAnimation?.removeStatusListener(_startScanWhenSettled);
+    _routeAnimation = null;
     _deviceDiscovery();
   }
 
@@ -78,6 +100,14 @@ class _DiscoverPageState extends State<DiscoverPage> {
         // Exit the loop if the widget is no longer mounted.
         return;
       }
+
+      // Probes finish in bursts of up to 25; repainting the page for each one
+      // drops frames while the add-device sheet animates in. The bar cannot
+      // show finer than a percent anyway.
+      final samePercent = (progress * 100).floor() == (_progress * 100).floor();
+
+      if (samePercent && progress < 1) return;
+
       setState(() {
         _progress = progress;
       });
@@ -110,6 +140,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
 
   @override
   void dispose() {
+    _routeAnimation?.removeStatusListener(_startScanWhenSettled);
     _subscription?.cancel();
     super.dispose();
   }
