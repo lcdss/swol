@@ -51,20 +51,23 @@ class _SettingsPageState extends State<SettingsPage> {
                   const ThemeSwitcher(),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.settingsDynamicColorTitle,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: useDynamicColor,
-                    builder: (context, enabled, _) =>
-                        Switch(value: enabled, onChanged: setUseDynamicColor),
-                  ),
-                ],
-              ),
+              // Hidden below Android 12: there are no system colors to follow,
+              // so the switch would do nothing.
+              if (dynamicColorSupported)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.settingsDynamicColorTitle,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: useDynamicColor,
+                      builder: (context, enabled, _) =>
+                          Switch(value: enabled, onChanged: setUseDynamicColor),
+                    ),
+                  ],
+                ),
             ],
           ),
           TextTitle(
