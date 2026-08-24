@@ -1,0 +1,31 @@
+lib/services/network.dart
+  s_758a1ac5f34d3e::t_e0c37a7bc6614d 3,108-172
+lib/screens/home/discover.dart
+  s_cdff33ff6f716c::t_3c6c1a3fae5d5f 35-36,107
+test/services/network_test.dart
+  s_cdff33ff6f716c::t_0fd5733a1fc234 353-377
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "b7721d83d1a5a9584e2dde6118d8c02ae8935a8f",
+  "prompts": {},
+  "sessions": {
+    "s_758a1ac5f34d3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3f378449-03c2-4956-bb24-5363ed45308b",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    },
+    "s_cdff33ff6f716c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "323f008e-1eb2-42c6-9595-03b735f40b0e",
+        "model": "unknown"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
