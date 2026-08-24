@@ -350,4 +350,29 @@ void main() {
       ]);
     });
   });
+
+  group('findDevicesInNetworkIsolated', () {
+    test('streams devices and progress from the scan isolate', () async {
+      // A /30 around loopback keeps the sweep to two real pings.
+      final progresses = <double>[];
+      final devices = await findDevicesInNetworkIsolated(
+        '127.0.0.1',
+        '255.255.255.252',
+        progresses.add,
+      ).toList();
+
+      expect(devices.map((d) => d.ipAddress), contains('127.0.0.1'));
+      expect(progresses.last, 1.0);
+    }, timeout: const Timeout(Duration(minutes: 1)));
+
+    test('cancelling the subscription tears the scan down cleanly', () async {
+      final subscription = findDevicesInNetworkIsolated(
+        '127.0.0.1',
+        '255.255.255.252',
+        (_) {},
+      ).listen((_) {});
+
+      await subscription.cancel();
+    });
+  });
 }

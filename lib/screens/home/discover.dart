@@ -32,8 +32,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
   @override
   void initState() {
     super.initState();
-    // Scanning spawns 25 concurrent ping chains; starting it while the page
-    // is still animating in drops frames on the push transition.
+    // The scan runs on its own isolate, but kicking it off still reads the
+    // Wi-Fi info over platform channels; let the push transition settle first.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
@@ -104,7 +104,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     // discoverCardSubnetNoNetwork and a pull-to-refresh can retry.
     if (network == null) return;
 
-    final stream = findDevicesInNetwork(network.ip, network.submask, (
+    final stream = findDevicesInNetworkIsolated(network.ip, network.submask, (
       progress,
     ) {
       if (!mounted) {

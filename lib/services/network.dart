@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:dart_ping/dart_ping.dart';
 import 'package:network_info_plus/network_info_plus.dart';
@@ -102,6 +103,71 @@ Stream<NetworkDevice> findDevicesInNetwork(
   }
 
   return controller.stream;
+}
+
+/// [findDevicesInNetwork], but run on its own isolate. Each probe spawns a
+/// ping process, and parsing the output of 25 concurrent chains on the UI
+/// isolate drops frames whenever a transition animates over a running scan.
+/// Cancelling the subscription kills the isolate mid-sweep.
+Stream<NetworkDevice> findDevicesInNetworkIsolated(
+  String localIp,
+  String submask,
+  void Function(double) progressCallback,
+) {
+  final controller = StreamController<NetworkDevice>();
+  final results = ReceivePort();
+  final spawning = Isolate.spawn(
+    _scanIsolateMain,
+    (results.sendPort, localIp, submask),
+    // Crash backstop: the VM posts null here if the isolate dies without
+    // reaching its own Isolate.exit sentinel. After a normal exit the first
+    // null closes the port, so this duplicate is dropped.
+    onExit: results.sendPort,
+  );
+
+  results.listen((message) {
+    switch (message) {
+      case final double progress:
+        progressCallback(progress);
+      case final NetworkDevice device:
+        controller.add(device);
+      case null:
+        results.close();
+        controller.close();
+    }
+  });
+
+  unawaited(
+    spawning.then((_) {}, onError: (Object _) {
+      results.close();
+      controller.close();
+    }),
+  );
+
+  controller.onCancel = () async {
+    results.close();
+
+    try {
+      (await spawning).kill(priority: Isolate.immediate);
+    } catch (_) {
+      // Spawning already failed and closed the stream; nothing to kill.
+    }
+  };
+
+  return controller.stream;
+}
+
+Future<void> _scanIsolateMain((SendPort, String, String) args) async {
+  final (port, localIp, submask) = args;
+  final devices = findDevicesInNetwork(localIp, submask, port.send);
+
+  await for (final device in devices) {
+    port.send(device);
+  }
+
+  // The ping processes leave watchers behind that keep this isolate alive
+  // after the sweep, so exit explicitly; it also delivers the sentinel.
+  Isolate.exit(port, null);
 }
 
 /// Validates [device] and sends its magic packets -- unicast, plus the
