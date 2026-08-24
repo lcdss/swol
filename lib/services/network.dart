@@ -138,10 +138,13 @@ Stream<NetworkDevice> findDevicesInNetworkIsolated(
   });
 
   unawaited(
-    spawning.then((_) {}, onError: (Object _) {
-      results.close();
-      controller.close();
-    }),
+    spawning.then(
+      (_) {},
+      onError: (Object _) {
+        results.close();
+        controller.close();
+      },
+    ),
   );
 
   controller.onCancel = () async {
