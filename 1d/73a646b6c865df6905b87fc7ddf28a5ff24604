@@ -1,0 +1,21 @@
+CHANGELOG.md
+  s_e788420465287b::t_f97f5d76bccf10 3-10
+pubspec.yaml
+  s_e788420465287b::t_f4b99c81b36cad 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "1d73a646b6c865df6905b87fc7ddf28a5ff24604",
+  "prompts": {},
+  "sessions": {
+    "s_e788420465287b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fea13e03-cbdd-4907-af35-a2d98d678457",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lucas Cândido <lcssbr@gmail.com>"
+    }
+  }
+}
