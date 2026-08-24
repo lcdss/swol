@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.2] - 26-08-23
+
+### Fixed
+
+- the Discover page no longer stutters while a scan is running: the network
+  sweep moved to a background isolate, and leaving the page now aborts it
+  instead of letting it drag down the next screen until it finished
+
 ## [1.4.1] - 26-08-23
 
 ### Fixed
